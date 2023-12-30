@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
+  <title>My WebVR House</title>
+</head>
+
+<body>
+  <a-scene>
+    <a-assets>
+      <!-- Add any assets here if needed -->
+    </a-assets>
+
+    <!-- Replace the sky color with a sky image -->
+    <a-sky src="images/d89ymso-aba8194a-ff3e-43b7-9040-6ec7c7d6aa41.jpg"></a-sky>
+
+<!-- Modern house structure -->
+<a-entity static-body geometry="primitive: box; depth: 6; height: 3; width: 10"
+position="0 1.5 0" material="src: #glassTexture; repeat: 2 2"></a-entity>
+
+<!-- Flat roof -->
+<a-entity static-body geometry="primitive: box; depth: 10.2; height: 0.2; width: 10.2"
+position="0 3 0" material="shader: flat; color: #333"></a-entity>
+
+<!-- Ground/floor -->
+<a-entity static-body geometry="primitive: box; depth: 20; height: 0.1; width: 20"
+position="0 -0.5 0" material="shader: flat; color: #2E8B57"></a-entity>
+  </a-scene>
+</body>
+</html>
