@@ -1,5 +1,19 @@
 {
   "dependencies": {
-    "aframe": "^1.5.0"
-  }
+    "aframe": "^1.5.0",
+    "aframe-watcher": "^1.4.0"
+  },
+  "name": "myhome",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

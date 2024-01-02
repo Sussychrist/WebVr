@@ -5,29 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
+  <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
   <title>My WebVR House</title>
 </head>
 
 <body>
-  <a-scene>
+  <a-scene environment="preset: forest; dressing: trees; groundColor: #004d00; groundTexture: none; horizonColor: #96a98a; skyColor: #b0d8ff; lightPosition: 1 50 -2; fog: 0.9; fogColor: #b0d8ff; shadow: true; dressingColor: #004d00">
+    <!-- Your scene elements go here -->
     <a-assets>
       <!-- Add any assets here if needed -->
+      <a-asset-item id="slide-door" src="assets/16668_84x96_Slider_Door-Black_V1.obj"></a-asset-item>
+      <a-asset-item id="slide-door-material" src="assets/16668_84x96_Slider_Door-Black_V1.mtl"></a-asset-item>
+      <a-asset-item id="car" src="assets/free_gmc_motorhome_reimagined_low_poly.glb"></a-asset-item>
+      <a-asset-item id="plant1" src="assets/tomato_plant.glb"></a-asset-item>
+      <a-asset-item id="double-door" src="assets/16689_60x80_Double_French_Mullion_Door-White_v1.obj"></a-asset-item>
+      <a-asset-item id="double-door-material" src="assets/16689_60x80_Double_French_Mullion_Door-White_v1.mtl"></a-asset-item>
+      <a-asset-item id="sofa" src="assets/sofa.obj"></a-asset-item>
+      <a-asset-item id="sofa-material" src="assets/sofa.mtl"></a-asset-item>
+      <a-asset-item id="lamp" src="assets/streetlamp.obj"></a-asset-item>
+      <a-asset-item id="lamp-material" src="assets/streetlamp.mtl"></a-asset-item>
+      <a-asset-item id="single-door" src="assets/door_glass_and_upper_glass_window.glb"></a-asset-item>
+      <a-asset-item id="car2" src="assets/classic_muscle_car.glb"></a-asset-item>
+      <a-asset-item id="plant2" src="assets/rhyzome_plant.glb"></a-asset-item>
+      <a-asset-item id="plant3" src="assets/potted_plant_mediterranean_med_leaf_low_poly.glb"></a-asset-item>
     </a-assets>
+    <a-light type="directional" position="1 50 -2" target="#ground" castShadow="true"></a-light>
 
     <!-- Replace the sky color with a sky image -->
     <a-sky src="images/d89ymso-aba8194a-ff3e-43b7-9040-6ec7c7d6aa41.jpg"></a-sky>
 
-<!-- Modern house structure -->
-<a-entity static-body geometry="primitive: box; depth: 6; height: 3; width: 10"
-position="0 1.5 0" material="src: #glassTexture; repeat: 2 2"></a-entity>
+    <!--Lamp-->
+    <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-2.31223 0.51971 -2.45745" scale="0.2 0.2 0.2" rotation="0 180 0"></a-entity>
+    <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-14.8236 0.51971 -2.45745" scale="0.2 0.2 0.2" rotation="0 180 0"></a-entity>
+    <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-17.68255 0.51971 14.0629" scale="0.2 0.2 0.2" rotation="0 180 0"></a-entity>
+    <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="6.35653 0.51971 -1.83939" scale="0.2 0.2 0.2" rotation="0 180 0"></a-entity>
+    <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="6.35653 0.51971 14.11911" scale="0.2 0.2 0.2" rotation="0 180 0"></a-entity>
 
-<!-- Flat roof -->
-<a-entity static-body geometry="primitive: box; depth: 10.2; height: 0.2; width: 10.2"
-position="0 3 0" material="shader: flat; color: #333"></a-entity>
+    <!--Plants-->
+    <a-entity gltf-model="#plant2" position="3.93342 0.57462 10.88881" scale="2 2 2" rotation=""></a-entity>
+    <a-entity gltf-model="#plant3" position="4.61696 0.60983 10.48752" scale="" rotation=""></a-entity>
+    <a-entity gltf-model="#plant3" position="4.46689 0.60983 10.79618" scale="0.5 0.5 0.5" rotation=""></a-entity>
+    <a-entity gltf-model="#plant3" position="-14.25759 0.56235 8.33884" scale="1.5 1.5 1.5" rotation=""></a-entity>
 
-<!-- Ground/floor -->
-<a-entity static-body geometry="primitive: box; depth: 20; height: 0.1; width: 20"
-position="0 -0.5 0" material="shader: flat; color: #2E8B57"></a-entity>
+    <!--Sofa-->
+    <a-entity obj-model="obj: #sofa; mtl: #sofa-material" position="-2.04764 0.62514 -1.69731" scale="0.6 1 1" rotation="0 180 0"></a-entity>
+
+    <!-- door floor 1 -->
+    <a-entity obj-model="obj: #slide-door; mtl: #slide-door-material" position="-6.437 2.33265 3.2819" scale="0.013 0.013 0.013" rotation="90 90 90"></a-entity>
+    <a-entity obj-model="obj: #slide-door; mtl: #slide-door-material" position="-12.66936 2.33265 3.2819" scale="0.013 0.013 0.013" rotation="90 90 90"></a-entity>
+    <a-entity obj-model="obj: #double-door; mtl: #double-door-material" position="-9.99895 2.22571 3.2819" scale="0.02 0.015 0.015" rotation="90 90 90"></a-entity>
+
+    <!--car-->
+    <a-entity gltf-model="#car2" position="10.5347 1.0595 6.86012" scale="0.5 0.5 0.55" rotation="0 180 0"></a-entity>
+    <a-entity gltf-model="#car" position="14.93725 2.04203 5.59805" scale="1.2 1.2 1.2" rotation="0 180 0"></a-entity>
+    <!--plane-->
+    <a-entity geometry="primitive: plane; width: 400; height: 400" rotation="-90 0 0" material="src: url(images/grass.jpg); repeat: 100 100" position="0 0.4 0"></a-entity>
+
+    <!--base-->
+    <a-entity static-body="" geometry="depth: 20; height: 0.21; width: 25" position="-5.37462 0.47524 4.32962" material="src: images/wooden-floor.jpg; repeat: 20 20"></a-entity>
+
+    <!--wall left-->
+    <a-entity static-body="" geometry="depth: 7; height: 3.5; width: 0.15" position="4.463 2.332 1.48317" material="src: images/stone-wall.jpg"></a-entity>
+    <a-entity obj-model="obj: #slide-door; mtl: #slide-door-material" position="4.44592 2.318 7.42031" scale="0.018 0.013 0.013" rotation="90 0 90"></a-entity>
+    <a-entity static-body="" geometry="depth: 6; height: 3.5; width: 0.15" position="1.53407 2.33707 -1.9801" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+    <a-entity static-body="" geometry="depth: 5.41; height: 3.5; width: 0.15" position="-1.39329 2.315 0.679" material="src: images/stone-wall.jpg"></a-entity>
+    <a-entity static-body="" geometry="depth: 1.3; height: 3.5; width: 0.15" position="4.43924 2.31482 9.40838" material="src: images/stone-wall.jpg"></a-entity>
+
+    <!--tiny frame-->
+    <a-entity static-body="" geometry="depth: 0.2; height: 3.5; width: 0.15" position="-8.35021 2.345 3.31021" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+    <a-entity static-body="" geometry="depth: 0.2; height: 3.5; width: 0.15" position="-11.54003 2.345 3.31021" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+
+    <!--wall right-->
+    <a-entity static-body="" geometry="depth: 1.2; height: 3.5; width: 0.15" position="-14.5622 2.3279 8.20623" material="src: images/stone-wall.jpg"></a-entity>
+    <a-entity obj-model="obj: #slide-door; mtl: #slide-door-material" position="-14.49015 2.33265 6.37383" scale="0.0155 0.013 0.013" rotation="90 0 90"></a-entity>
+    <a-entity static-body="" geometry="height: 3.5; width: 0.15" position="-14.5622 2.3279 3.71879" material="src: images/stone-wall.jpg"></a-entity>
+
+    <!--wall front-->
+    <a-entity static-body="" geometry="depth: 4.05; height: 3.5; width: 0.15" position="-3.3897 2.345 3.314" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+
+    <!--wall behind 1-->
+    <a-entity static-body="" geometry="depth: 3.5; height: 3.5; width: 0.15" position="-2.6512 2.32539 10.00271" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+    <a-entity obj-model="obj: #double-door; mtl: #double-door-material" position="0.67145 2.22571 10.01179" scale="0.02 0.015 0.015" rotation="90 90 90"></a-entity>
+    <a-entity static-body="" geometry="depth: 0.6; height: 3.5; width: 0.15" position="2.48847 2.32405 10.00857" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+    <a-entity gltf-model="#single-door" position="2.77418 1.77249 10.06493" scale="0.2 0.19 0.4" rotation="0 180 0"></a-entity>
+    <a-entity static-body="" geometry="depth: 0.75; height: 3.5; width: 0.15" position="4.14312 2.32489 10.00857" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+
+    <!--wall behind 2-->
+    <a-entity static-body="" geometry="depth: 5; height: 3.5; width: 0.15" position="-12.11965 2.325 8.74659" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+    <a-entity gltf-model="#single-door" position="-9.62711 1.83002 8.82728" scale="0.26 0.2 0.58" rotation="0 180 0"></a-entity>
+    <a-entity obj-model="obj: #slide-door; mtl: #slide-door-material" position="-5.82254 2.39969 8.78013" scale="0.018 0.015 0.014" rotation="90 90 90"></a-entity>
+
+    <!--bathroom-->
+    <a-entity static-body="" geometry="depth: 2.5; height: 3.5; width: 0.15" position="-1.53798 2.31482 8.86171" material="src: images/stone-wall.jpg"></a-entity>
+    <a-entity static-body="" geometry="depth: 2.5; height: 3.5; width: 0.15" position="-4.36488 2.31482 8.79537" material="src: images/stone-wall.jpg"></a-entity>
+
+    <!--second floor expansion-->
+    <a-entity static-body="" geometry="depth: 3; height: 0.2; width: 6" position="-2.96175 4 13.0651" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+    <a-entity static-body="" geometry="depth: 12; height: 0.2; width: 7.3" position="-10.43544 4 12.4122" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+
+    <!--stair-->
+    <a-entity static-body="" geometry="depth: 2; height: 3.5; width: 0.15" position="-4.88981 2.28953 4.34602" material="src: images/stone-wall.jpg"></a-entity>
+
+    <!--tiny-->
+    <a-entity static-body="" geometry="depth: 6; height: 1.22; width: 0.06" position="4.18209 0.94018 -5.65572" material="src: images/tiny-wall.jpg; repeat: 4 1" rotation="0 90 0"></a-entity>
+    <a-entity static-body="" geometry="depth: 12; height: 1.22; width: 0.06" position="-11.86521 0.94018 -5.6362" material="src: images/tiny-wall.jpg; repeat: 9 1" rotation="0 90 0"></a-entity>
+    <a-entity static-body="" geometry="depth: 20.09; height: 1.22; width: 0.06" position="7.15058 0.94383 4.34278" material="src: images/tiny-wall.jpg; repeat: 17 1"></a-entity>
+    <a-entity static-body="" geometry="depth: 20.09; height: 1.22; width: 0.06" position="-17.82592 0.94383 4.34863" material="src: images/tiny-wall.jpg; repeat: 17 1"></a-entity>
+    <a-entity static-body="" geometry="depth: 25.05; height: 1.22; width: 0.06" position="-5.31572 0.94383 14.41099" material="src: images/tiny-wall.jpg; repeat: 20 1" rotation="0 90 0"></a-entity>
+</a-scene>
+</body>
   </a-scene>
 </body>
 </html>
