@@ -1,20 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
   <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
-  <script src="https://unpkg.com/aframe-animation-mixer@2.0.0/dist/aframe-animation-mixer.min.js"></script>
+  <script
+    src="https://rawgit.com/fernandojsg/aframe-teleport-controls/master/dist/aframe-teleport-controls.min.js"></script>
 
   <title>My WebVR House</title>
 </head>
 
 <body>
-  <a-scene 
-    environment="preset: forest; dressing: trees; dreessingAmount: 30; ground: flat; groundColor: #656c65; groundTexture: none; horizonColor: #96a98a; skyColor: #b0d8ff; lightPosition: 1 50 -2; fog: 0.5w; fogColor: #b0d8ff; shadow: true; dressingColor: #004d00">
+  <a-scene
+    environment="preset: forest; dressing: trees; ground: flat; groundColor: #656c65; groundTexture: none; horizonColor: #96a98a; skyColor: #b0d8ff; lightPosition: 1 50 -2; fog: 0.5w; fogColor: #b0d8ff; shadow: true; dressingColor: #004d00">
     <!-- Your scene elements go here -->
     <a-assets>
       <!--======================================== Model Assets =========================================================-->
@@ -56,6 +54,10 @@
 
       <!--Images-->
       <a-asset-item id="tv" src="images/tv.png"></a-asset-item>
+      <img id="fire" src="images/fire.png">
+      <img id="black" src="images/black.jpg">
+      <img id="steel" src="images/steel.jpg">
+      <img id="smoke" src="images/smoke.png">
 
       <!--Audio-->
       <audio id="openDoorAudio" src="assets/audio/opendoor.mp3" sound></audio>
@@ -68,18 +70,26 @@
       <audio id="drawerClose" src="assets/audio/drawerclose.mp3" sound></audio>
       <audio id="drawerOpen" src="assets/audio/draweropen.mp3" sound></audio>
 
+      <audio id="toiletAudio" src="assets/audio/toiletFuck.mp3" sound></audio>
+      <audio id="sinkAudio" src="assets/audio/sink.mp3" sound></audio>
+      <audio id="showerAudio" src="assets/audio/shower.mp3" loop sound></audio>
+      <audio id="gasAudio" src="assets/audio/gas.mp3" sound></audio>
+      <audio id="teleport" src="assets/audio/teleport.mp3"></audio>
+
+
       <!--Video-->
-      <video id="tv-video" src="videos/tv.mp4" loop ></video>
-      <video id="ps5-video" src="videos/ps5.mp4"  loop></video>
+      <video id="tv-video" src="videos/tv.mp4" loop></video>
+      <video id="ps5-video" src="videos/ps5.mp4" loop></video>
     </a-assets>
 
     <a-light type="directional" position="1 50 -2" target="#ground" castShadow="true"></a-light>
 
     <!-- Camera Rig with Raycaster -->
     <a-entity camera="" id="cameraRig" position="-7.895 2.2 -18.43716" rotation="0 90 0"
-      wasd-controls="acceleration: 30" look-controls="pointerLockEnabled: true; touchEnabled: false"
-      raycaster="far: 5; objects: .intersectable">
-      <a-entity cursor="fuse: true; fuseTimeout: 1000; rayOrigin: mouse">
+      wasd-controls="acceleration: 30" look-controls="pointerLockEnabled: true; touchEnabled: false">
+
+      <!-- Cursor entity should be a child of the camera entity -->
+      <a-entity cursor="fuse: true; fuseTimeout: 1000; rayOrigin: mouse" raycaster="far: 10; objects: .intersectable">
         <a-entity position="0 0 -0.75">
           <!-- Horizontal line of the cross -->
           <a-plane width="0.05" height="0.005" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
@@ -90,88 +100,598 @@
         </a-entity>
       </a-entity>
     </a-entity>
-  <!--=========================================================================================-->  
-      <!--============================================================================JS=============================================================================-->
+
+
+    <!--=========================================================================================-->
+
+    <!--=====================================================================Interactable=========================================================================================-->
+    <!--Entrance doors-->
+    <!-- Door left -->
+    <a-entity id="double-door-1" door="isOpen: false" class="intersectable" static-body="" position="-9.17592 0.52224 3.31"
+      gltf-model="#double-door" scale="1.5 1.2 1.485" rotation="0 270 0" door></a-entity>
+
+    <!-- Door right -->
+    <a-entity id="double-door-2" door="isOpen: false" class="intersectable" static-body="" position="-10.687 0.51933 3.31"
+      gltf-model="#double-door" scale="1.5 1.2 1.485" rotation="0 90 0" door></a-entity>
+
+    <!--=========================================================================================-->
+
+    <!-- Back doors -->
+    <a-entity id="back-double-door-1" backdoor="isOpen: false" class="intersectable" static-body="" position="-0.11894 0.55543 10.013"
+      gltf-model="#double-door" scale="1.5 1.15 1.55" rotation="0 90 0" backdoor></a-entity>
+
+    <a-entity id="back-double-door-2" backdoor="isOpen: false" class="intersectable" static-body="" position="1.45762 0.55543 10.013"
+      gltf-model="#double-door" scale="1.5 1.15 1.55" rotation="0 270 0" backdoor></a-entity>
+
+    <!--=========================================================================================-->
+
+    <!-- Pool door -->
+    <a-entity id="pool-door" class="intersectable" static-body="" position="-9.62711 1.83002 8.82728"
+      gltf-model="#single-door" scale="0.26 0.2 0.58" rotation="0 180 0" pooldoor></a-entity>
+
+    <!--=========================================================================================-->
+
+    <!-- Bathroom door -->
+    <a-entity id="bathroom-door-1" class="intersectable" static-body="" position="-1.48867 0.54 8.63875"
+      gltf-model="#door" scale="0.2 0.3 0.3" rotation="0 180 0" bathroomdoor></a-entity>
+
+    <!--=========================================================================================-->
+
+    <!-- Fridge doors -->
+    <a-entity id="fridge-door-1" class="intersectable" static-body="" position="-0.22207 1.86745 2.12807"
+      geometry="depth: 0.75; height: 2.57; width: 0.06" material="src: images/fridge-door.jpg; repeat: 0 2"
+      rotation="0 0 0" scale="1 1 1" fridgedoor></a-entity>
+
+    <a-entity id="fridge-door-2" class="intersectable" static-body="" position="-0.22207 1.86714 1.3806"
+      geometry="depth: 0.75; height: 2.57; width: 0.06" material="src: images/fridge-door.jpg; repeat: 0 2"
+      rotation="0 0 0" scale="1 1 1" fridgedoor></a-entity>
+
+    <!-- Handles -->
+    <a-entity id="handle1" class="intersectable" static-body="" geometry="depth: 0.05; width: 0.05"
+      position="-0.09834 2.0126 1.90948" material="src: images/metal-solid.jpg" rotation="0 0 0" scale="1 1 1.2"
+      fridgedoor></a-entity>
+
+    <a-entity id="handle2" class="intersectable" static-body="" geometry="depth: 0.05; width: 0.05"
+      position="-0.09834 2.0126 1.60382" material="src: images/metal-solid.jpg" rotation="0 0 0" scale="1 1 1.2"
+      fridgedoor></a-entity>
+
+    <!--=========================================================================================-->
+
+    <!-- small storage door -->
+    <a-entity id="small-storage-door-1" class="intersectable" static-body=""
+      geometry="depth: 0.44; height: 1.05; width: 0.02" position="-0.49617 3.43639 -1.36877"
+      material="src: images/dark-texture.jpg" rotation="0 90 0" scale="1 1 1.2" smallstoragedoor></a-entity>
+
+    <a-entity id="small-storage-door-2" class="intersectable" static-body=""
+      geometry="depth: 0.44; height: 1.05; width: 0.02" position="0.03015 3.43639 -1.36877"
+      material="src: images/dark-texture.jpg" rotation="0 90 0" scale="1 1 1.2" smallstoragedoor></a-entity>
+
+    <!--small storage handle -->
+    <a-entity id="handle-small-storage-1" class="intersectable" static-body=""
+      geometry="depth: 0.01; height: 0.2; width: 0.05" position="-0.08669 3.50788 -1.29269"
+      material="src: images/white.jpg" rotation="" scale="1 1 1.2" smallstoragedoor></a-entity>
+    <a-entity id="handle-small-storage-2" static-body="" geometry="depth: 0.01; height: 0.2; width: 0.05"
+      position="-0.38846 3.50788 -1.29269" material="src: images/white.jpg" rotation="" scale="1 1 1.2"
+      smallstoragedoor></a-entity>
+
+    <!--=========================================================================================-->
+
+    <!--Storage door-->
+    <a-entity id="storage-door-1" class="intersectable" static-body="" geometry="height: 3.5; width: 0.05"
+      position="-0.7869 2.32204 -0.47444" material="src: images/shiny-black.jpg; repeat: 0 1" rotation="0 90 0"
+      scale="1 1 1.2" storagedoor></a-entity>
+    <a-entity id="storage-door-2" class="intersectable" static-body="" geometry="height: 3.5; width: 0.05"
+      position="0.41011 2.32204 -0.47444" material="src: images/shiny-black.jpg; repeat: 0 1" rotation="0 90 0"
+      scale="1 1 1.2" storagedoor></a-entity>
+
+    <!-- Handles of inside storage -->
+    <a-entity id="handle-storage-1" class="intersectable" static-body="" geometry="depth: 0.1; height: 0.5; width: 0.05"
+      position="-0.43765 2.32204 -0.44493" material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"
+      storagedoor></a-entity>
+
+    <a-entity id="handle-storage-2" class="intersectable" static-body="" geometry="depth: 0.1; height: 0.5; width: 0.05"
+      position="0.02765 2.32204 -0.44493" material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"
+      storagedoor></a-entity>
+
+    <!--=========================================================================================-->
+    <!-- Boxes door 1 -->
+    <a-entity id="boxes-door-1" class="intersectable" static-body="" geometry="depth: 0.55; height: 0.87; width: 0.02"
+      position="1.9548 1.10462 -0.91695" material="src: images/dark-texture.jpg" rotation="0 90 0" scale="1 1 1.2"
+      boxesdoor></a-entity>
+
+    <!-- Boxes Handle 1 -->
+    <a-entity id="handle-boxes-1" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="2.01904 1.43714 -0.88374" material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2"
+      boxesdoor></a-entity>
+
+    <!--Boxes door 2-->
+    <a-entity id="boxes-door-2" class="intersectable" static-body="" geometry="depth: 0.64; height: 1.4; width: 0.02"
+      position="1.9548 2.24583 -0.90258" material="src: images/dark-texture.jpg" rotation="0 90 0"
+      boxesdoor2></a-entity>
+    <!--Boxes Handle 2-->
+    <a-entity id="handle-boxes-2" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="2.01904 1.62829 -0.88374" material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2"
+      boxesdoor2></a-entity>
+
+    <!--Boxes door 3-->
+    <a-entity id="boxes-door-3" class="intersectable" static-body="" geometry="depth: 0.64; height: 0.65; width: 0.02"
+      position="1.9548 3.26608 -0.9025" material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor3></a-entity>
+
+    <!--Boxes Handle 3-->
+    <a-entity id="handle-boxes-3" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="2.01904 3.04595 -0.88374" material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2"
+      boxesdoor3></a-entity>
+
+    <!--Boxes door 4-->
+    <a-entity id="boxes-door-4" class="intersectable" static-body="" geometry="depth: 0.71; height: 1.23; width: 0.02"
+      position="2.62905 2.96795 -0.917" material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor4></a-entity>
+
+    <!--Boxes Handle 4-->
+    <a-entity id="handle-boxes-4" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="2.86394 2.64347 -0.88374" material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"
+      boxesdoor4></a-entity>
+
+    <!--Boxes door 5-->
+    <a-entity id="boxes-door-5" class="intersectable" static-body="" geometry="depth: 0.69; height: 0.91; width: 0.02"
+      position="3.33715 2.79565 -0.917" material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor5></a-entity>
+
+    <!--Boxes Handle 5-->
+    <a-entity id="handle-boxes-5" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="3.0935 2.64347 -0.88374" material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"
+      boxesdoor5></a-entity>
+
+    <!--Boxes door 6-->
+    <a-entity id="boxes-door-6" class="intersectable" static-body="" geometry="depth: 0.69; height: 0.91; width: 0.02"
+      position="4.0313 2.79565 -0.917" material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor6></a-entity>
+
+    <!--Boxes  Handle 6-->
+    <a-entity id="handle-boxes-6" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="3.79911 2.64347 -0.88374" material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"
+      boxesdoor6></a-entity>
+
+    <!--Boxes door 7-->
+    <a-entity id="boxes-door-7" class="intersectable" static-body="" geometry="depth: 1.1; height: 0.8; width: 0.02"
+      position="3.69441 1.0734 -0.36638" material="src: images/dark-texture.jpg" rotation="0.01 0 0"
+      boxesdoor7></a-entity>
+
+    <!--Boxes  Handle 7-->
+    <a-entity id="handle-boxes-7" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="3.67654 1.08804 -0.00156" material="src: images/metal-solid.jpg" rotation="" scale="1 1 1.2"
+      boxesdoor7></a-entity>
+
+    <!--Boxes door 8-->
+    <a-entity id="boxes-door-8" class="intersectable" static-body="" geometry="depth: 0.55; height: 0.8; width: 0.02"
+      position="3.69441 1.0734 1.81199" material="src: images/dark-texture.jpg" rotation="0.01 0 0"
+      boxesdoor8></a-entity>
+
+    <!--Boxes  Handle 8-->
+    <a-entity id="handle-boxes-8" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="3.67654 1.08804 1.63343" material="src: images/metal-solid.jpg" rotation="" scale="1 1 1.2"
+      boxesdoor8></a-entity>
+
+    <!--=========================================================================================-->
+    <!-- TV -->
+    <a-entity id="tvScreen" class="intersectable" static-body geometry="depth: 2; height: 1.2; width: 0.02"
+      position="-12.55001 2.13166 8.46826" material="side:double; src: images/tv.png; shader: flat" scale=""
+      rotation="0 90 0" tv>
+      <a-video id="tvVideo" src="#tv-video" width="2" height="1.2" loop="true" scale="0 0 0" position="0.014 0 0"
+        rotation="0 90  0"></a-video>
+      <a-video id="ps5Video" src="#ps5-video" width="2" height="1.2" loop="true" scale="0 0 0" rotation="0 90 0"
+        position="0.014 0 0"></a-video>
+    </a-entity>
+
+    <!-- Speaker -->
+    <a-entity id="speaker1" static-body geometry="depth: 0.3; height: 0.5; width: 0.02"
+      position="-13.75919 2.39557 8.51467" material="src: images/speaker.jpg" scale="" rotation="0 90 0"></a-entity>
+
+    <a-entity id="speaker2" static-body geometry="depth: 0.3; height: 0.5; width: 0.02"
+      position="-11.33162 2.38937 8.51384" material="src: images/speaker.jpg" scale="" rotation="0 90 0"></a-entity>
+
+    <!-- Ps5 with Video -->
+    <a-entity id="ps5Entity" class="intersectable" gltf-model="#ps5" position="-11.22127 1.34128 8.34235"
+      scale="0.5 0.5 0.5" rotation="0 90 0" ps5>
+    </a-entity>
+    <a-entity gltf-model="#controller" position="-11.30797 1.43551 8.09191" scale="0.5 0.5 0.5"
+      rotation="-65 45 0"></a-entity>
+    <!--=========================================================================================-->
+    <!--toilet-->
+    <a-entity id="toiletEntity" class="intersectable" gltf-model="#toilet" position="-2.37137 0.54 9.54463"
+      scale="0.015 0.015 0.015" rotation="0 180 0" sound="on: click; src: #toiletAudio"></a-entity>
+
+    <!--Sink-->
+    <a-entity id="bathroomsink" class="intersectable" gltf-model="#b-sink" position="-2.36728 1.62329 7.96671"
+      scale="0.012 0.015 0.015" rotation="0 270 0" bathroomsink></a-entity>
+
+    <!-- Additional Water to be scaled -->
+    <a-entity id="water1" geometry="width: 0.02; height: 0.61; depth: 0.27"
+      material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="-2.361 1.71588 7.9591"
+      rotation="0 0 90" scale="0 0 0"></a-entity>
+
+    <a-entity id="water2" geometry="height: 0.24; primitive: cylinder; radius: 0.01"
+      material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="-2.361 1.82659 7.91446"
+      scale="0 0 0"></a-entity>
+
+    <!--Shower-->
+    <a-entity id="shower" class="intersectable" static-body=""
+      geometry="height: 0.05; primitive: cylinder; radius: 0.07" position="3.84771 5.81581 6.99834"
+      material="src: images/metal-solid.jpg" rotation="90 0 0" scale="1 1 1.2" shower></a-entity>
+    <!--heat modify-->
+    <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06"
+      position="-3.407 1.933 9.94393" material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"
+      shower></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.06"
+      position="-3.40613 1.86724 9.89169" material="src: images/metal-solid.jpg" rotation="90 0 0" scale="1 1 1.2"
+      shower></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="-3.29154 2.00786 9.89169" material="src: images/metal-solid.jpg" rotation="90 0 0" scale="1 1 1.2"
+      shower></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="-3.40976 2.00786 9.89169" material="src: images/metal-solid.jpg" rotation="90 0 0" scale="1 1 1.2"
+      shower></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="-3.52019 2.00786 9.89169" material="src: images/metal-solid.jpg" rotation="90 0 0" scale="1 1 1.2"
+      shower></a-entity>
+
+    <!---Shower water-->
+    <a-entity id="shower-water" geometry="width: 0.35; height: 3; depth: 0.35"
+      material="color: #00ace6; opacity: 0.7; transparent: true; roughness: 0.1" position="-3.723 2.02617 9.4505"
+      rotation="0 90 0" scale="0 0 0" sound="src: #showerAudio"></a-entity>
+
+    <!---===============================================================================================-->
+    <!--pool shower-->
+    <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06"
+      position="-3.38253 1.93131 10.09689" material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2"
+      pool-shower></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.5; primitive: cylinder; radius: 0.03"
+      position="-3.71465 3.59234 10.34337" material="src: images/steel.jpg" rotation="90 0 0" scale="1 1 1.2"
+      pool-shower></a-entity>
+    <!--water-->
+    <a-entity id="shower-water-2" geometry="width: 0.35; height: 3; depth: 0.35"
+      material="color: #00ace6; opacity: 0.7; transparent: true; roughness: 0.1" position="-3.723 2.02617 10.56409"
+      rotation="0 90 0" scale="0 0 1" sound="src:  #showerAudio"></a-entity>
+
+    <!--Kitchen sink-->
+    <a-entity id="kitchensink" class="intersectable" gltf-model="#sink" position="2.8119 1.5335 -1.48322" scale=""
+      rotation="0 270 0" kitchensink></a-entity>
+
+    <!--Kitchen water-->
+    <a-entity id="water2-1" geometry="height: 0.24; primitive: cylinder; radius: 0.01"
+      material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="2.81189 1.641 -1.528"
+      scale="0 0 0"></a-entity>
+    <a-entity id="water2-2" geometry="width: 0.02; height: 0.84; depth: 0.53"
+      material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="2.81785 1.51373 -1.5056"
+      rotation="0 0 90" scale="0 0 0"></a-entity>
+
+    <!--Stove-->
+    <a-entity class="intersectable" gltf-model="#stove" position="4.40658 0.54527 0.5997" scale="1.1 1.1 1.1"
+      rotation="0 180 0" stove></a-entity>
+
+    <!--Fire-->
+    <a-entity id="gas-stove" position="3.82592 1.51 0.36094" scale="0 0 0">
+      <a-entity geometry="primitive: plane; height: 0.12; width: 0.12" position="0 0.085 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #fire"
+        animation__position="property: position; to: 0 0.095 0; easing: linear; dur: 350; loop: true"></a-entity>
+      <!---Smoke-->
+      <a-entity geometry="primitive: plane; height: 0.2; width: 0.2" position="0 0.095 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
+
+      <a-entity geometry="primitive: plane; height: 0.2; width: 0.2" position="0 0.095 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
+
+
+      <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
+
+      <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
+      <!--Smoke-->
+      <a-entity geometry="primitive: plane; height: 0.12; width: 0.12" position="0 0.085 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #fire"
+        animation__position="property: position; to: 0 0.095 0; easing: linear; dur: 300; loop: true"></a-entity>
+    </a-entity>
+    <a-entity id="gas-stove-2" position="3.85092 1.51 0.80446" scale="0 0 0">
+      <a-entity geometry="primitive: plane; height: 0.12; width: 0.12" position="0 0.09042000000008515 0"
+        rotation="0 90 0" material="shader: flat; side: double; transparent: true; src: #fire"
+        animation__position="property: position; to: 0 0.095 0; easing: linear; dur: 350; loop: true"></a-entity>
+      <!---Smoke-->
+      <a-entity geometry="primitive: plane; height: 0.2; width: 0.2" position="0 0.095 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
+
+      <a-entity geometry="primitive: plane; height: 0.2; width: 0.2" position="0 0.095 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
+
+
+      <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
+
+      <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
+      <!--Smoke-->
+      <a-entity geometry="primitive: plane; height: 0.12; width: 0.12" position="0 0.095 0.00033" rotation=""
+        material="shader: flat; side: double; transparent: true; src: #fire"
+        animation__position="property: position; to: 0 0.095 0; easing: linear; dur: 300; loop: NaN"></a-entity>
+    </a-entity>
+
+    <a-entity id="gas-stove-3" position="4.07926 1.51 0.38503" scale="0 0 0">
+      <a-entity geometry="primitive: plane; height: 0.12; width: 0.12" position="0 0.08940000000000001 0"
+        rotation="0 90 0" material="shader: flat; side: double; transparent: true; src: #fire"
+        animation__position="property: position; to: 0 0.095 0; easing: linear; dur: 350; loop: true"></a-entity>
+      <!---Smoke-->
+      <a-entity geometry="primitive: plane; height: 0.2; width: 0.2" position="0 0.095 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
+
+      <a-entity geometry="primitive: plane; height: 0.2; width: 0.2" position="0 0.095 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
+
+
+      <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
+
+      <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
+      <!--Smoke-->
+      <a-entity geometry="primitive: plane; height: 0.12; width: 0.12" position="0 0.08862666666656734 0" rotation=""
+        material="shader: flat; side: double; transparent: true; src: #fire"
+        animation__position="property: position; to: 0 0.095 0; easing: linear; dur: 300; loop: true"></a-entity>
+    </a-entity>
+
+    <a-entity id="gas-stove-4" position="4.10056 1.51 0.84137" scale="0 0 0">
+      <a-entity geometry="primitive: plane; height: 0.12; width: 0.12" position="0 0.08892285714298487 0"
+        rotation="0 90 0" material="shader: flat; side: double; transparent: true; src: #fire"
+        animation__position="property: position; to: 0 0.095 0; easing: linear; dur: 350; loop: true"></a-entity>
+      <!---Smoke-->
+      <a-entity geometry="primitive: plane; height: 0.2; width: 0.2" position="0 0.095 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
+
+      <a-entity geometry="primitive: plane; height: 0.2; width: 0.2" position="0 0.095 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
+
+
+      <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 90 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
+
+      <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 0 0"
+        material="shader: flat; side: double; transparent: true; src: #smoke"
+        animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
+      <!--Smoke-->
+      <a-entity geometry="primitive: plane; height: 0.12; width: 0.12" position="0 0.08769000000009934 0" rotation=""
+        material="shader: flat; side: double; transparent: true; src: #fire"
+        animation__position="property: position; to: 0 0.095 0; easing: linear; dur: 300; loop: true"></a-entity>
+    </a-entity>
+
+    <!--Tele up -->
+    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-5.20485 2.345 4.44403"
+      material="src: #black" scale="" rotation="0 0 0.01" teleportation-up></a-entity>
+
+    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.1"
+      position="-5.16097 2.345 4.44403" material="src: #steel" scale="" rotation="0 0 90" teleportation-up></a-entity>
+
+    <!--tele down-->
+    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-1.9633 5.85016 3.39505"
+      material="src: #black" scale="" rotation="0 90 0.01"
+      teleportation-down></a-entity>
+    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.1"
+      position="-1.96863 5.84108 3.42424" material="src: #steel" scale="" rotation="0 90 90"
+      teleportation-down></a-entity>
+
+    <!-- Bedroom door -->
+    <a-entity class="intersectable" id="bedroomdoor-1" gltf-model="#door" position="0.3798 4.10988 1.38675" scale="0.3 0.3 0.3" rotation="" bedroomdoor></a-entity>
+
+    <!--Bathroom 2 door-->
+    <a-entity class="intersectable" id="bathroomdoor-2" gltf-model="#door" position="0.935 4.10988 2.72942" scale="0.3 0.3 0.25" rotation="0 90 0" bathroomdoor2></a-entity>
+
+    <!--storage room door-->
+    <a-entity class="intersectable" id="storagedoorsingle-1" gltf-model="#door" position="0.3798 4.10988 8.55605" scale="0.3 0.3 0.3" rotation="" storagedoor2></a-entity>
+
+    <!--bedroom Door 2-->
+    <a-entity class="intersectable" id="bedroomdoor2" gltf-model="#door2" position="-10.56676 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0" bedroomdoor2></a-entity>
+
+    <!--bathroom door3-->
+    <a-entity class="intersectable" id="bathroomdoor-3" gltf-model="#door2" position="-7.98797 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0" bathroomdoor3></a-entity>
+
+    <!--workroom door-->
+    <a-entity class="intersectable" id="workroomdoor" gltf-model="#door2" position="-4.28127 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0" workroom></a-entity>
+
+    <!--Shower 2-->
+    <!---Heat modifier-->
+    <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="3.84412 5.88993 7.04127"
+      material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2" shower2></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="3.96046 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
+      scale="1 1 1.2" shower2></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="3.85295 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
+      scale="1 1 1.2" shower2></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="3.74866 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
+      scale="1 1 1.2" shower2></a-entity>
+
+
+    <!--=====================================================================Interactable End=========================================================================================-->
+
+    <!--============================================================================JS=============================================================================-->
 
     <script>
       //Entrance door
       AFRAME.registerComponent('door', {
         init: function () {
           this.el.addEventListener('click', this.toggleDoors.bind(this));
+          // Set the initial rotation for door1 based on the isOpen attribute
+          if (this.el.id === 'double-door-1') {
+            this.updateRotation();
+          }
         },
         toggleDoors: function () {
           var door1 = document.getElementById('double-door-1');
           var door2 = document.getElementById('double-door-2');
-
-          // Toggle the door state
+      
           var isOpen1 = door1.getAttribute('door').isOpen;
           var isOpen2 = door2.getAttribute('door').isOpen;
-
+      
           door1.setAttribute('door', 'isOpen', !isOpen1);
           door2.setAttribute('door', 'isOpen', !isOpen2);
-
-          // Update door properties based on the state
-          if (!isOpen1) {
-            door1.setAttribute('position', '-8.49563 0.52224 3.96794');
-            door1.setAttribute('rotation', '0 0 0');
-          } else {
-            door1.setAttribute('position', '-9.17592 0.52224 3.31');
-            door1.setAttribute('rotation', '0 270 0');
-          }
-
-          if (!isOpen2) {
-            door2.setAttribute('position', '-11.452 0.519 3.968');
-            door2.setAttribute('rotation', '0 0 0');
-          } else {
-            door2.setAttribute('position', '-10.687 0.51933 3.31');
-            door2.setAttribute('rotation', '0 90 0');
-          }
-          // Play the sound effect based on the state
+      
+          var animationDuration = 400;
+          var easing = 'easeInOutQuad';
+      
+          door1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen1 ? '-8.49563 0.52224 3.96794' : '-9.17592 0.52224 3.31'
+          });
+          door1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen1 ? '0 0 0' : '0 -90 0'
+          });
+      
+          door2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen2 ? '-11.452 0.519 3.968' : '-10.687 0.51933 3.31'
+          });
+          door2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen2 ? '0 0 0' : '0 90 0'
+          });
+      
           var audioId = isOpen1 || isOpen2 ? 'closeDoorAudio' : 'openDoorAudio';
           var audio = document.getElementById(audioId);
-
-          // Check if the audio element is defined and is loaded
+      
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            // If the audio is not loaded, wait for the 'loadeddata' event
             audio.addEventListener('loadeddata', function () {
               audio.play();
             });
           }
+        },
+        updateRotation: function () {
+          // Set the initial rotation for door1 based on the isOpen attribute
+          var isOpen = this.el.getAttribute('door').isOpen;
+          var initialRotation = isOpen ? '0 -90 0' : '0 0 0';
+          this.el.setAttribute('rotation', initialRotation);
         }
       });
-
+      
       //back Doors
       AFRAME.registerComponent('backdoor', {
         init: function () {
           this.el.addEventListener('click', this.toggleDoors.bind(this));
+          // Set the initial rotation for backDoor2 based on the isOpen attribute
+          if (this.el.id === 'back-double-door-2') {
+            this.updateRotation();
+          }
         },
         toggleDoors: function () {
           var backDoor1 = document.getElementById('back-double-door-1');
           var backDoor2 = document.getElementById('back-double-door-2');
-
+      
           var isOpenBack1 = backDoor1.getAttribute('backdoor').isOpen;
           var isOpenBack2 = backDoor2.getAttribute('backdoor').isOpen;
-
+      
           backDoor1.setAttribute('backdoor', 'isOpen', !isOpenBack1);
           backDoor2.setAttribute('backdoor', 'isOpen', !isOpenBack2);
-          if (!isOpenBack1) {
-            backDoor1.setAttribute('position', '-0.87091 0.555 10.70427');
-            backDoor1.setAttribute('rotation', '0 0 0');
-          } else {
-            backDoor1.setAttribute('position', '-0.11894 0.55543 10.013');
-            backDoor1.setAttribute('rotation', '0 90 0');
-          }
-          if (!isOpenBack2) {
-            backDoor2.setAttribute('position', '2.13587 0.55543 10.71952');
-            backDoor2.setAttribute('rotation', '0 0 0');
-          } else {
-            backDoor2.setAttribute('position', '1.45762 0.55543 10.013');
-            backDoor2.setAttribute('rotation', '0 270 0');
-          }
+      
+          var animationDuration = 400;
+          var easing = 'easeInOutQuad';
+      
+          backDoor1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenBack1 ? '-0.87091 0.555 10.70427' : '-0.11894 0.55543 10.013'
+          });
+          backDoor1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenBack1 ? '0 0 0' : '0 90 0'
+          });
+      
+          backDoor2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenBack2 ? '2.13587 0.55543 10.71952' : '1.45762 0.55543 10.013'
+          });
+          backDoor2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenBack2 ? '0 0 0' : '0 -90 0'
+          });
+      
           var audioId = isOpenBack1 || isOpenBack2 ? 'closeDoorAudio' : 'openDoorAudio';
           var audio = document.getElementById(audioId);
+      
+          if (audio && audio.readyState >= 2) {
+            audio.play();
+          } else {
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
+          }
+        },
+        updateRotation: function () {
+          // Set the initial rotation for backDoor2 based on the isOpen attribute
+          var isOpen = this.el.getAttribute('backdoor').isOpen;
+          var initialRotation = isOpen ? '0 -90 0' : '0 0 0';
+          this.el.setAttribute('rotation', initialRotation);
+        }
+      });      
+      
+      //Bathroom door
+      AFRAME.registerComponent('bathroomdoor', {
+        schema: { isOpenB: { default: false } },
+        init: function () {
+          this.el.addEventListener('click', this.toggleDoor.bind(this));
+        },
+        toggleDoor: function () {
+          var bathroomDoor = document.getElementById('bathroom-door-1');
+          var isOpenB = bathroomDoor.getAttribute('bathroomdoor').isOpenB;
+      
+          bathroomDoor.setAttribute('bathroomdoor', 'isOpenB', !isOpenB);
+
+          var animationDuration = 600;  
+          var easing = 'easeInOutQuad';
+      
+          bathroomDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenB ? '0 180 0' : '0 270 0'
+          });
+          bathroomDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenB ? '-1.48867 0.54 8.63875' : '-1.01557 0.54 8.07976'
+          });
+
+          var audioId = isOpenB ? 'closeDoorAudio' : 'openDoorAudio';
+          var audio = document.getElementById(audioId);
+
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
@@ -181,53 +701,48 @@
           }
         }
       });
-
-      //Bathroom door
-      AFRAME.registerComponent('bathroomdoor', {
-        schema: { isOpenB: { default: false } },
-        init: function () { this.el.addEventListener('click', this.toggleDoor.bind(this)); },
-        toggleDoor: function () {
-          var bathroomDoor = document.getElementById('bathroom-door-1');
-          var isOpenB = bathroomDoor.getAttribute('bathroomdoor').isOpenB;
-    
-          bathroomDoor.setAttribute('bathroomdoor', 'isOpenB', !isOpenB);
-          bathroomDoor.setAttribute('rotation', isOpenB ? '0 180 0' : '0 270 0');
-          bathroomDoor.setAttribute('position', isOpenB ? '-1.48867 0.54 8.63875' : '-1.01557 0.54 8.07976');
-    
-          var audioId = isOpenB ? 'closeDoorAudio' : 'openDoorAudio';
-          var audio = document.getElementById(audioId);
-    
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
-          }
-        }
-      });
-
+      
       //pool door
       AFRAME.registerComponent('pooldoor', {
         schema: { isOpenP: { default: false } },
-        init: function () { this.el.addEventListener('click', this.toggleDoor.bind(this)); },
+        init: function () {
+          this.el.addEventListener('click', this.toggleDoor.bind(this));
+        },
         toggleDoor: function () {
           var poolDoor = document.getElementById('pool-door');
           var isOpenP = poolDoor.getAttribute('pooldoor').isOpenP;
-    
+
           poolDoor.setAttribute('pooldoor', 'isOpenP', !isOpenP);
-          poolDoor.setAttribute('rotation', isOpenP ? '0 180 0' : '0 90 0');
-          poolDoor.setAttribute('position', isOpenP ? '-9.62711 1.83002 8.82728' : '-9.627 1.83002 8.67283');
-    
+
+          var animationDuration = 600;  
+          var easing = 'easeInOutQuad';  
+
+          poolDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenP ? '0 180 0' : '0 90 0'
+          });
+          poolDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenP ? '-9.62711 1.83002 8.82728' : '-9.627 1.83002 8.67283'
+          });
+
           var audioId = isOpenP ? 'closeDoorAudio' : 'openDoorAudio';
           var audio = document.getElementById(audioId);
-    
+      
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
       });
-
+      
       //refrigerator
       AFRAME.registerComponent('fridgedoor', {
         schema: { isOpenF: { default: false } },
@@ -242,37 +757,68 @@
       
           var isOpenF1 = fridgeDoor1.getAttribute('fridgedoor').isOpenF;
           var isOpenF2 = fridgeDoor2.getAttribute('fridgedoor').isOpenF;
-      
+
           fridgeDoor1.setAttribute('fridgedoor', 'isOpenF', !isOpenF1);
           fridgeDoor2.setAttribute('fridgedoor', 'isOpenF', !isOpenF2);
+
+          var animationDuration = 0; 
+          var easing = 'easeInOutQuad';  
       
-          if (!isOpenF1) {
-            fridgeDoor1.setAttribute('position', '-0.22207 1.86745 2.12807');
-            fridgeDoor1.setAttribute('rotation', '0 0 0');
-            handle1.setAttribute('position', '-0.09834 2.0126 1.90948');
-            handle1.setAttribute('rotation', '0 0 0');
-          } else {
-            fridgeDoor1.setAttribute('position', '0.10934 1.86745 2.49779');
-            fridgeDoor1.setAttribute('rotation', '0 -100 0');
-            handle1.setAttribute('position', '0.33928 2.0126 2.56258');
-            handle1.setAttribute('rotation', '0 -100 0');
-          }
+          fridgeDoor1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenF1 ? '0 0 0' : '0 -100 0'
+          });
+          fridgeDoor1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenF1 ? '-0.22207 1.86745 2.12807' : '0.10934 1.86745 2.49779'
+          });
       
-          if (!isOpenF2) {
-            fridgeDoor2.setAttribute('position', '-0.22207 1.86714 1.3806');
-            fridgeDoor2.setAttribute('rotation', '0 0 0');
-            handle2.setAttribute('position', '-0.09834 2.0126 1.60382');
-            handle2.setAttribute('rotation', '0 0 0');
-          } else {
-            fridgeDoor2.setAttribute('position', '0.096 1.86714 0.97803');
-            fridgeDoor2.setAttribute('rotation', '0 100 0');
-            handle2.setAttribute('position', '0.3463 2.0126 0.90191');
-            handle2.setAttribute('rotation', '0 100 0');
-          }
+          handle1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenF1 ? '0 0 0' : '0 -100 0'
+          });
+          handle1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenF1 ? '-0.09834 2.0126 1.90948' : '0.33928 2.0126 2.56258'
+          });
       
+          fridgeDoor2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenF2 ? '0 0 0' : '0 100 0'
+          });
+          fridgeDoor2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenF2 ? '-0.22207 1.86714 1.3806' : '0.096 1.86714 0.97803'
+          });
+      
+          handle2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenF2 ? '0 0 0' : '0 100 0'
+          });
+          handle2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenF2 ? '-0.09834 2.0126 1.60382' : '0.3463 2.0126 0.90191'
+          });
+
           var audioId = isOpenF1 || isOpenF2 ? 'openFridge' : 'closeFridge';
           var audio = document.getElementById(audioId);
-      
+
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
@@ -282,12 +828,12 @@
           var fridgeRunningSound = document.getElementById('Fridge');
 
           if (isOpenF1 || isOpenF2) {
-            fridgeRunningSound.play();
-            fridgeRunningSound.loop = true; 
-          } else {
             fridgeRunningSound.pause();
-            fridgeRunningSound.currentTime = 0; 
-            fridgeRunningSound.loop = false; 
+            fridgeRunningSound.loop = true;
+          } else {
+            fridgeRunningSound.play();
+            fridgeRunningSound.currentTime = 0;
+            fridgeRunningSound.loop = false;
           }
         }
       });
@@ -310,29 +856,60 @@
           storageDoor1.setAttribute('storagedoor', 'isOpenS', !isOpenS1);
           storageDoor2.setAttribute('storagedoor', 'isOpenS', !isOpenS2);
       
-          if (!isOpenS1) {
-            storageDoor1.setAttribute('position', '-0.7869 2.32204 -0.47444');
-            storageDoor1.setAttribute('rotation', '0 90 0');
-            handle1.setAttribute('position', '-0.43765 2.32204 -0.44493');
-            handle1.setAttribute('rotation', '0 90 0');
-          } else {
-            storageDoor1.setAttribute('position', '-1.30988 2.32204 0.06979');
-            storageDoor1.setAttribute('rotation', '0 0 0');
-            handle1.setAttribute('position', '-1.33575 2.32204 0.5045');
-            handle1.setAttribute('rotation', '0 0 0');
-          }
+          var animationDuration = 0;  
+          var easing = 'easeInOutQuad';  
       
-          if (!isOpenS2) {
-            storageDoor2.setAttribute('position', '0.41011 2.32204 -0.47444');
-            storageDoor2.setAttribute('rotation', '0 90 0');
-            handle2.setAttribute('position', '0.02765 2.32204 -0.44493');
-            handle2.setAttribute('rotation', '0 90 0');
-          } else {
-            storageDoor2.setAttribute('position', '1.00315 2.32204 0.12903');
-            storageDoor2.setAttribute('rotation', '0 0 0');
-            handle2.setAttribute('position', '1.04491 2.322 0.52845');
-            handle2.setAttribute('rotation', '0 0 0');
-          }
+          storageDoor1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenS1 ? '0 90 0' : '0 0 0'
+          });
+          storageDoor1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenS1 ? '-0.7869 2.32204 -0.47444' : '-1.30988 2.32204 0.06979'
+          });
+      
+          handle1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenS1 ? '0 90 0' : '0 0 0'
+          });
+          handle1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenS1 ? '-0.43765 2.32204 -0.44493' : '-1.33575 2.32204 0.5045'
+          });
+      
+          storageDoor2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenS2 ? '0 90 0' : '0 0 0'
+          });
+          storageDoor2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenS2 ? '0.41011 2.32204 -0.47444' : '1.00315 2.32204 0.12903'
+          });
+      
+          handle2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenS2 ? '0 90 0' : '0 0 0'
+          });
+          handle2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenS2 ? '0.02765 2.32204 -0.44493' : '1.04491 2.322 0.52845'
+          });
       
           var audioId = isOpenS1 || isOpenS2 ? 'storageOpen' : 'storageClose';
           var audio = document.getElementById(audioId);
@@ -340,11 +917,13 @@
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
       });
-
+      
       // Small Storage doors
       AFRAME.registerComponent('smallstoragedoor', {
         schema: { isOpenSS: { default: false } },
@@ -356,48 +935,81 @@
           var smallStorageDoor2 = document.getElementById('small-storage-door-2');
           var handle1 = document.getElementById('handle-small-storage-1');
           var handle2 = document.getElementById('handle-small-storage-2');
-
+      
           var isOpenSS1 = smallStorageDoor1.getAttribute('smallstoragedoor').isOpenSS;
           var isOpenSS2 = smallStorageDoor2.getAttribute('smallstoragedoor').isOpenSS;
 
           smallStorageDoor1.setAttribute('smallstoragedoor', 'isOpenSS', !isOpenSS1);
           smallStorageDoor2.setAttribute('smallstoragedoor', 'isOpenSS', !isOpenSS2);
 
-          if (!isOpenSS1) {
-            smallStorageDoor1.setAttribute('position', '-0.49617 3.43639 -1.36877');
-            smallStorageDoor1.setAttribute('rotation', '0 90 0');
-            handle1.setAttribute('position', '-0.08669 3.50788 -1.29269');
-            handle1.setAttribute('rotation', '0 0 0');
-          } else {
-            smallStorageDoor1.setAttribute('position', '-0.76035 3.43263 -1.1184');
-            smallStorageDoor1.setAttribute('rotation', '0 0 0');
-            handle1.setAttribute('position', '-0.77454 3.50788 -0.91007');
-            handle1.setAttribute('rotation', '0 90 0');
-          }
-
-          if (!isOpenSS2) {
-            smallStorageDoor2.setAttribute('position', '0.03015 3.43639 -1.36877');
-            smallStorageDoor2.setAttribute('rotation', '0 90 0');
-            handle2.setAttribute('position', '-0.38846 3.50788 -1.29269');
-            handle2.setAttribute('rotation', '0 0 0');
-          } else {
-            smallStorageDoor2.setAttribute('position', '0.28416 3.43639 -1.10795');
-            smallStorageDoor2.setAttribute('rotation', '0 0 0');
-            handle2.setAttribute('position', '0.29548 3.50788 -0.96703');
-            handle2.setAttribute('rotation', '0 90 0');
-          }
-
+          var animationDuration = 0;  
+          var easing = 'easeInOutQuad';  
+      
+          smallStorageDoor1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenSS1 ? '0 90 0' : '0 0 0'
+          });
+          smallStorageDoor1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenSS1 ? '-0.49617 3.43639 -1.36877' : '-0.76035 3.43263 -1.1184'
+          });
+      
+          handle1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenSS1 ? '0 0 0' : '0 90 0'
+          });
+          handle1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenSS1 ? '-0.08669 3.50788 -1.29269' : '-0.77454 3.50788 -0.91007'
+          });
+      
+          smallStorageDoor2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenSS2 ? '0 90 0' : '0 0 0'
+          });
+          smallStorageDoor2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenSS2 ? '0.03015 3.43639 -1.36877' : '0.28416 3.43639 -1.10795'
+          });
+      
+          handle2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenSS2 ? '0 0 0' : '0 90 0'
+          });
+          handle2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenSS2 ? '-0.38846 3.50788 -1.29269' : '0.29548 3.50788 -0.96703'
+          });
+      
           var audioId = isOpenSS1 || isOpenSS2 ? 'drawerOpen' : 'drawerClose';
           var audio = document.getElementById(audioId);
 
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
-      });
-      
+      });      
+
       //Box 1
       AFRAME.registerComponent('boxesdoor', {
         init: function () {
@@ -409,28 +1021,54 @@
           var isOpenb1 = boxesDoor.getAttribute('boxesdoor').isOpenb1;
       
           boxesDoor.setAttribute('boxesdoor', 'isOpenb1', !isOpenb1);
-          boxesDoor.setAttribute('rotation', isOpenb1 ? '0 90 0' : '0 170 0');
-          boxesDoor.setAttribute('position', isOpenb1 ? '1.9548 1.10462 -0.91695' : '1.596 1.10462 -0.608');
-          
-          handle.setAttribute('rotation', isOpenb1 ? '90 90 0' : '90 170 0');
-          handle.setAttribute('position', isOpenb1 ? '2.01904 1.43714 -0.88374' : '1.568 1.43714 -0.549');
       
-          // Check if raycasting components are present and update the collidable class
+          var animationDuration = 0;  
+          var easing = 'easeInOutQuad';  
+
+          boxesDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb1 ? '0 90 0' : '0 170 0'
+          });
+          boxesDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb1 ? '1.9548 1.10462 -0.91695' : '1.596 1.10462 -0.608'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb1 ? '90 90 0' : '90 170 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb1 ? '2.01904 1.43714 -0.88374' : '1.568 1.43714 -0.549'
+          });
+      
           if (!boxesDoor.hasAttribute('raycaster')) {
             boxesDoor.setAttribute('raycaster', 'objects: .collidable');
           }
-      
+ 
           var audioId = isOpenb1 ? 'drawerClose' : 'drawerOpen';
           var audio = document.getElementById(audioId);
       
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
-      });
-      
+      });      
+
       // Box 2
       AFRAME.registerComponent('boxesdoor2', {
         init: function () {
@@ -440,30 +1078,52 @@
           var boxesDoor = document.getElementById('boxes-door-2');
           var handle = document.getElementById('handle-boxes-2');
           var isOpenb2 = boxesDoor.getAttribute('boxesdoor2').isOpenb2;
-
+      
           boxesDoor.setAttribute('boxesdoor2', 'isOpenb2', !isOpenb2);
-          boxesDoor.setAttribute('rotation', isOpenb2 ? '0 90 0' : '0 170 0');
-          boxesDoor.setAttribute('position', isOpenb2 ? '1.9548 2.24583 -0.90258' : '1.59602 2.246 -0.60841');
+      
+          var animationDuration = 0;  
+          var easing = 'easeInOutQuad';  
 
-          handle.setAttribute('rotation', isOpenb2 ? '90 90 0' : '90 170 0');
-          handle.setAttribute('position', isOpenb2 ? '2.01904 1.62829 -0.88374' : '1.56824 1.62829 -0.54871');
-
-          // Check if raycasting components are present and update the collidable class
-          if (!boxesDoor.hasAttribute('raycaster')) {
-            boxesDoor.setAttribute('raycaster', 'objects: .collidable');
-          }
-
+          boxesDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb2 ? '0 90 0' : '0 170 0'
+          });
+          boxesDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb2 ? '1.9548 2.24583 -0.90258' : '1.59602 2.246 -0.60841'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb2 ? '90 90 0' : '90 170 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb2 ? '2.01904 1.62829 -0.88374' : '1.56824 1.62829 -0.54871'
+          });
+      
           var audioId = isOpenb2 ? 'drawerClose' : 'drawerOpen';
           var audio = document.getElementById(audioId);
 
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
       });
-    
+      
       // Box 3
       AFRAME.registerComponent('boxesdoor3', {
         init: function () {
@@ -473,29 +1133,56 @@
           var boxesDoor = document.getElementById('boxes-door-3');
           var handle = document.getElementById('handle-boxes-3');
           var isOpenb3 = boxesDoor.getAttribute('boxesdoor3').isOpenb3;
-
+      
+          // Toggle the door state
           boxesDoor.setAttribute('boxesdoor3', 'isOpenb3', !isOpenb3);
-          boxesDoor.setAttribute('rotation', isOpenb3 ? '0 90 0' : '0 170 0');
-          boxesDoor.setAttribute('position', isOpenb3 ? '1.9548 3.26608 -0.9025' : '1.596 3.26608 -0.608');
+      
+          // Define animation properties
+          var animationDuration = 0; 
+          var easing = 'easeInOutQuad';  
 
-          handle.setAttribute('rotation', isOpenb3 ? '90 90 0' : '90 170 0');
-          handle.setAttribute('position', isOpenb3 ? '2.01904 3.04595 -0.88374' : '1.568 3.04595 -0.549');
-
-          // Check if raycasting components are present and update the collidable class
-          if (!boxesDoor.hasAttribute('raycaster')) {
-            boxesDoor.setAttribute('raycaster', 'objects: .collidable');
-          }
-
+          // Update door properties based on the state with animation
+          boxesDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb3 ? '0 90 0' : '0 170 0'
+          });
+          boxesDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb3 ? '1.9548 3.26608 -0.9025' : '1.596 3.26608 -0.608'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb3 ? '90 90 0' : '90 170 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb3 ? '2.01904 3.04595 -0.88374' : '1.568 3.04595 -0.549'
+          });
+      
+          // Play the sound effect based on the state
           var audioId = isOpenb3 ? 'drawerClose' : 'drawerOpen';
           var audio = document.getElementById(audioId);
-
+      
+          // Check if the audio element is defined and is loaded
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            // If the audio is not loaded, wait for the 'loadeddata' event
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
-      });
+      });      
 
       // Box 4
       AFRAME.registerComponent('boxesdoor4', {
@@ -506,29 +1193,56 @@
           var boxesDoor = document.getElementById('boxes-door-4');
           var handle = document.getElementById('handle-boxes-4');
           var isOpenb4 = boxesDoor.getAttribute('boxesdoor4').isOpenb4;
-
+      
+          // Toggle the door state
           boxesDoor.setAttribute('boxesdoor4', 'isOpenb4', !isOpenb4);
-          boxesDoor.setAttribute('rotation', isOpenb4 ? '0 90 0' : '0 170 0');
-          boxesDoor.setAttribute('position', isOpenb4 ? '2.62905 2.96795 -0.917' : '2.22453 2.96795 -0.57238');
-
-          handle.setAttribute('rotation', isOpenb4 ? '0 90 0' : '0 -10 0');
-          handle.setAttribute('position', isOpenb4 ? '2.86394 2.64347 -0.88374' : '2.17656 2.64347 -0.38159');
-
-          // Check if raycasting components are present and update the collidable class
-          if (!boxesDoor.hasAttribute('raycaster')) {
-            boxesDoor.setAttribute('raycaster', 'objects: .collidable');
-          }
-
+      
+          // Define animation properties
+          var animationDuration = 0;  
+          var easing = 'easeInOutQuad';  
+      
+          // Update door properties based on the state with animation
+          boxesDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb4 ? '0 90 0' : '0 170 0'
+          });
+          boxesDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb4 ? '2.62905 2.96795 -0.917' : '2.22453 2.96795 -0.57238'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb4 ? '0 90 0' : '0 -10 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb4 ? '2.86394 2.64347 -0.88374' : '2.17656 2.64347 -0.38159'
+          });
+      
+          // Play the sound effect based on the state
           var audioId = isOpenb4 ? 'drawerClose' : 'drawerOpen';
           var audio = document.getElementById(audioId);
-
+      
+          // Check if the audio element is defined and is loaded
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            // If the audio is not loaded, wait for the 'loadeddata' event
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
-      });
+      });      
 
       // Box 5
       AFRAME.registerComponent('boxesdoor5', {
@@ -539,30 +1253,62 @@
           var boxesDoor = document.getElementById('boxes-door-5');
           var handle = document.getElementById('handle-boxes-5');
           var isOpenb5 = boxesDoor.getAttribute('boxesdoor5').isOpenb5;
-
+      
+          // Toggle the door state
           boxesDoor.setAttribute('boxesdoor5', 'isOpenb5', !isOpenb5);
-          boxesDoor.setAttribute('rotation', isOpenb5 ? '0 90 0' : '0 10 0');
-          boxesDoor.setAttribute('position', isOpenb5 ? '3.33715 2.79565 -0.917' : '3.71341 2.79565 -0.60342');
-
-          handle.setAttribute('rotation', isOpenb5 ? '0 90 0' : '0 10 0');
-          handle.setAttribute('position', isOpenb5 ? '3.0935 2.64347 -0.88374' : '3.75165 2.64347 -0.42411');
-
+      
+          // Define animation properties
+          var animationDuration = 0;  
+          var easing = 'easeInOutQuad';  
+      
+          // Update door properties based on the state with animation
+          boxesDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb5 ? '0 90 0' : '0 10 0'
+          });
+          boxesDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb5 ? '3.33715 2.79565 -0.917' : '3.71341 2.79565 -0.60342'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb5 ? '0 90 0' : '0 10 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb5 ? '3.0935 2.64347 -0.88374' : '3.75165 2.64347 -0.42411'
+          });
+      
           // Check if raycasting components are present and update the collidable class
           if (!boxesDoor.hasAttribute('raycaster')) {
             boxesDoor.setAttribute('raycaster', 'objects: .collidable');
           }
-
+      
+          // Play the sound effect based on the state
           var audioId = isOpenb5 ? 'drawerClose' : 'drawerOpen';
           var audio = document.getElementById(audioId);
-
+      
+          // Check if the audio element is defined and is loaded
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            // If the audio is not loaded, wait for the 'loadeddata' event
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
       });
-
+      
       // Box 6
       AFRAME.registerComponent('boxesdoor6', {
         init: function () {
@@ -572,30 +1318,62 @@
           var boxesDoor = document.getElementById('boxes-door-6');
           var handle = document.getElementById('handle-boxes-6');
           var isOpenb6 = boxesDoor.getAttribute('boxesdoor6').isOpenb6;
-
+      
+          // Toggle the door state
           boxesDoor.setAttribute('boxesdoor6', 'isOpenb6', !isOpenb6);
-          boxesDoor.setAttribute('rotation', isOpenb6 ? '0 90 0' : '0 0 0');
-          boxesDoor.setAttribute('position', isOpenb6 ? '4.0313 2.79565 -0.917' : '4.38493 2.79565 -0.58662');
-
-          handle.setAttribute('rotation', isOpenb6 ? '0 90 0' : '0 90 0');
-          handle.setAttribute('position', isOpenb6 ? '3.79911 2.64347 -0.88374' : '4.40576 2.64347 -0.88374');
-
+      
+          // Define animation properties
+          var animationDuration = 0;  
+          var easing = 'easeInOutQuad';  
+      
+          // Update door properties based on the state with animation
+          boxesDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb6 ? '0 90 0' : '0 0 0'
+          });
+          boxesDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb6 ? '4.0313 2.79565 -0.917' : '4.38493 2.79565 -0.58662'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb6 ? '0 90 0' : '0 90 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb6 ? '3.79911 2.64347 -0.88374' : '4.40576 2.64347 -0.88374'
+          });
+      
           // Check if raycasting components are present and update the collidable class
           if (!boxesDoor.hasAttribute('raycaster')) {
             boxesDoor.setAttribute('raycaster', 'objects: .collidable');
           }
-
+      
+          // Play the sound effect based on the state
           var audioId = isOpenb6 ? 'drawerClose' : 'drawerOpen';
           var audio = document.getElementById(audioId);
-
+      
+          // Check if the audio element is defined and is loaded
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            // If the audio is not loaded, wait for the 'loadeddata' event
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
       });
-
+      
       // Box 7
       AFRAME.registerComponent('boxesdoor7', {
         init: function () {
@@ -605,29 +1383,53 @@
           var boxesDoor = document.getElementById('boxes-door-7');
           var handle = document.getElementById('handle-boxes-7');
           var isOpenb7 = boxesDoor.getAttribute('boxesdoor7').isOpenb7;
-
+      
+          // Toggle the door state
           boxesDoor.setAttribute('boxesdoor7', 'isOpenb7', !isOpenb7);
-          boxesDoor.setAttribute('rotation', isOpenb7 ? '0 0 0' : '0 0 0');
-          boxesDoor.setAttribute('position', isOpenb7 ? '3.69441 1.0734 -0.36638' : '3.694 1.073 -1.25966');
-
-          handle.setAttribute('rotation', isOpenb7 ? '0 0 0' : '0 0 0');
-          handle.setAttribute('position', isOpenb7 ? '3.67654 1.08804 -0.00156' : '3.67654 1.08804 -0.86773');
-
-          // Check if raycasting components are present and update the collidable class
-          if (!boxesDoor.hasAttribute('raycaster')) {
-            boxesDoor.setAttribute('raycaster', 'objects: .collidable');
-          }
-
+      
+          // Define animation properties
+          var animationDuration = 500;  
+          var easing = 'easeInOutQuad';  
+      
+          // Update door properties based on the state with animation
+          boxesDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb7 ? '0 0 0' : '0 0 0'
+          });
+          boxesDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb7 ? '3.69441 1.0734 -0.36638' : '3.694 1.073 -1.25966'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb7 ? '0 0 0' : '0 0 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb7 ? '3.67654 1.08804 -0.00156' : '3.67654 1.08804 -0.86773'
+          });
+      
           var audioId = isOpenb7 ? 'drawerClose' : 'drawerOpen';
           var audio = document.getElementById(audioId);
-
+      
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
-      });
+      });      
 
       // Box 8
       AFRAME.registerComponent('boxesdoor8', {
@@ -638,249 +1440,590 @@
           var boxesDoor = document.getElementById('boxes-door-8');
           var handle = document.getElementById('handle-boxes-8');
           var isOpenb8 = boxesDoor.getAttribute('boxesdoor8').isOpenb8;
-
+      
+          // Toggle the door state
           boxesDoor.setAttribute('boxesdoor8', 'isOpenb8', !isOpenb8);
-          boxesDoor.setAttribute('rotation', isOpenb8 ? '0 0 0' : '0 100 0');
-          boxesDoor.setAttribute('position', isOpenb8 ? '3.69441 1.0734 1.81199' : '3.4434 1.073 2.12672');
-
-          handle.setAttribute('rotation', isOpenb8 ? '0 0 0' : '0 100 0');
-          handle.setAttribute('position', isOpenb8 ? '3.67654 1.08804 1.63343' : '3.30317 1.08804 2.15208');
-
+      
+          // Define animation properties
+          var animationDuration = 500;  
+          var easing = 'easeInOutQuad';  
+      
+          // Update door properties based on the state with animation
+          boxesDoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb8 ? '0 0 0' : '0 100 0'
+          });
+          boxesDoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb8 ? '3.69441 1.0734 1.81199' : '3.4434 1.073 2.12672'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb8 ? '0 0 0' : '0 100 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenb8 ? '3.67654 1.08804 1.63343' : '3.30317 1.08804 2.15208'
+          });
+      
           // Check if raycasting components are present and update the collidable class
           if (!boxesDoor.hasAttribute('raycaster')) {
             boxesDoor.setAttribute('raycaster', 'objects: .collidable');
           }
-
+      
+          // Play the sound effect based on the state
           var audioId = isOpenb8 ? 'drawerClose' : 'drawerOpen';
           var audio = document.getElementById(audioId);
-
+      
+          // Check if the audio element is defined and is loaded
           if (audio && audio.readyState >= 2) {
             audio.play();
           } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
+            // If the audio is not loaded, wait for the 'loadeddata' event
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
           }
         }
       });
       
       //Tv and Ps5
       document.addEventListener('DOMContentLoaded', function () {
-        var tvEntity = document.getElementById('tvScreen');
-        var ps5Entity = document.getElementById('ps5Entity'); // Assuming you have an entity with id 'ps5Entity'
-    
-        var videoEntity = document.getElementById('tvVideo');
-        var ps5VideoEntity = document.getElementById('ps5Video'); // Assuming you have an entity with id 'ps5Video'
-    
-        var currentVideoEntity = null;
-        var isVideoPlaying = false;
-    
-        // Function to toggle play/pause and show/hide video on entity click
-        function toggleVideo(video) {
-            if (currentVideoEntity && currentVideoEntity !== video) {
-                // If another video is currently playing, pause it and hide it
-                currentVideoEntity.components.material.material.map.image.pause();
-                currentVideoEntity.setAttribute('scale', '0 0 0');
-            }
-    
-            if (isVideoPlaying) {
-                video.components.material.material.map.image.pause();
+        const HIDDEN_SCALE = '0 0 0';
+
+        class VideoController {
+          constructor(videoEntity, speakerEntity1, speakerEntity2, otherController) {
+            this.videoEntity = videoEntity;
+            this.speakerEntity1 = speakerEntity1;
+            this.speakerEntity2 = speakerEntity2;
+            this.isVideoPlaying = false;
+            this.otherController = otherController;
+          }
+
+          toggleVideo() {
+            if (this.isVideoPlaying) {
+              this.pauseAndHideVideo();
             } else {
-                video.components.material.material.map.image.play();
+              // Pause the other video before playing this one
+              if (this.otherController.isVideoPlaying) {
+                this.otherController.pauseAndHideVideo();
+              }
+              this.playVideo();
             }
-    
-            // Toggle the scale to show/hide the video box
-            var scale = isVideoPlaying ? '0 0 0' : '1 1 1';
-            video.setAttribute('scale', scale);
-    
-            currentVideoEntity = video;
-            isVideoPlaying = !isVideoPlaying;
+            this.isVideoPlaying = !this.isVideoPlaying;
+          }
+
+          pauseAndHideVideo() {
+            this.pauseVideo();
+            this.hideVideoBox();
+            this.resetSpeakerAnimation();
+          }
+
+          pauseVideo() {
+            this.videoEntity.components.material.material.map.image.pause();
+            this.resetSpeakerAnimation();
+          }
+
+          playVideo() {
+            this.videoEntity.components.material.material.map.image.play();
+            this.startSpeakerAnimations();
+            this.showVideoBox();
+          }
+
+          hideVideoBox() {
+            this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
+          }
+
+          showVideoBox() {
+            this.videoEntity.setAttribute('scale', '1 1 1');
+          }
+
+          resetSpeakerAnimation() {
+            this.speakerEntity1.removeAttribute('animation__scale');
+            this.speakerEntity2.removeAttribute('animation__scale');
+          }
+
+          startSpeakerAnimations() {
+            this.speakerEntity1.setAttribute('animation__scale', "property: scale; to: 1.2 1.2 1.2; easing: easeInOutQuad; dur: 500; loop: true");
+            this.speakerEntity2.setAttribute('animation__scale', "property: scale; to: 1.2 1.2 1.2; easing: easeInOutQuad; dur: 500; loop: true");
+          }
         }
-    
-        // Function to show TV video on click
-        function showTVVideo() {
-            toggleVideo(videoEntity);
-        }
-    
-        // Function to show Ps5 video on click
-        function showPs5Video() {
-            toggleVideo(ps5VideoEntity);
-        }
-    
-        // Add click event listeners to the TV and Ps5 entities
-        tvEntity.addEventListener('click', showTVVideo);
-        ps5Entity.addEventListener('click', showPs5Video);
-    });
+
+        const tvVideoController = new VideoController(
+          document.getElementById('tvVideo'),
+          document.getElementById('speaker1'),
+          document.getElementById('speaker2'),
+          null
+        );
+
+        const ps5VideoController = new VideoController(
+          document.getElementById('ps5Video'),
+          document.getElementById('speaker1'),
+          document.getElementById('speaker2'),
+          tvVideoController
+        );
+
+        // Set the other controller for each instance
+        tvVideoController.otherController = ps5VideoController;
+
+        document.getElementById('tvScreen').addEventListener('click', () => tvVideoController.toggleVideo());
+        document.getElementById('ps5Entity').addEventListener('click', () => ps5VideoController.toggleVideo());
+      });
+
+      //Sink
+      AFRAME.registerComponent('bathroomsink', {
+        init: function () {
+          var el = this.el;
+          var waterEntities = document.querySelectorAll('#water1, #water2');
+          var isWaterVisible = false;
+
+          el.addEventListener('click', function () {
+            isWaterVisible = !isWaterVisible;
+
+            if (isWaterVisible) {
+              // Show water by setting the scale
+              waterEntities.forEach(function (entity) {
+                entity.setAttribute('scale', '1 1 1');
+              });
+
+              // Start audio playback
+              el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
+            } else {
+              // Hide water by setting the scale to 0
+              waterEntities.forEach(function (entity) {
+                entity.setAttribute('scale', '0 0 0');
+              });
+
+              // Stop audio playback
+              el.removeAttribute('sound');
+            }
+          });
+        },
+      });
+
+      //Shower
+      AFRAME.registerComponent('shower', {
+        init: function () {
+          var el = this.el;
+          var showerWater = document.getElementById('shower-water');
+          var showerAudio = document.getElementById('showerAudio');
+          var isWaterVisible = false;
+
+          el.addEventListener('click', function () {
+            isWaterVisible = !isWaterVisible;
+
+            if (isWaterVisible) {
+              // Show water by setting the scale
+              showerWater.setAttribute('scale', '1 1 1.2');
+
+              // Start audio playback
+              showerAudio.play();
+            } else {
+              // Hide water by setting the scale to 0
+              showerWater.setAttribute('scale', '0 0 0');
+
+              // Stop audio playback
+              showerAudio.pause();
+              showerAudio.currentTime = 0; // Reset the audio to the beginning
+            }
+          });
+        },
+      });
+
+      //pool shower 
+      AFRAME.registerComponent('pool-shower', {
+        init: function () {
+          var el = this.el;
+          var showerWater = document.getElementById('shower-water-2');
+          var showerAudio = document.getElementById('showerAudio');
+          var isWaterVisible = false;
+
+          el.addEventListener('click', function () {
+            isWaterVisible = !isWaterVisible;
+
+            if (isWaterVisible) {
+              // Show water by setting the scale
+              showerWater.setAttribute('scale', '1 1 1.2');
+
+              // Start audio playback
+              showerAudio.play();
+            } else {
+              // Hide water by setting the scale to 0
+              showerWater.setAttribute('scale', '0 0 0');
+
+              // Stop audio playback
+              showerAudio.pause();
+              showerAudio.currentTime = 0; // Reset the audio to the beginning
+            }
+          });
+        },
+      });
+
+      //Kitchen Sink
+      AFRAME.registerComponent('kitchensink', {
+        init: function () {
+          var el = this.el;
+          var waterEntities = document.querySelectorAll('#water2-1, #water2-2');
+          var isWaterVisible = false;
+
+          el.addEventListener('click', function () {
+            isWaterVisible = !isWaterVisible;
+
+            if (isWaterVisible) {
+              // Show water by setting the scale
+              waterEntities.forEach(function (entity) {
+                entity.setAttribute('scale', '1 1 1');
+              });
+
+              // Start audio playback
+              el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
+            } else {
+              // Hide water by setting the scale to 0
+              waterEntities.forEach(function (entity) {
+                entity.setAttribute('scale', '0 0 0');
+              });
+
+              // Stop audio playback
+              el.removeAttribute('sound');
+            }
+          });
+        },
+      });
+
+      //Gas Stove 
+      AFRAME.registerComponent('stove', {
+
+        init: function () {
+          var el = this.el;
+          var waterEntities = document.querySelectorAll('#gas-stove, #gas-stove-2, #gas-stove-3, #gas-stove-4');
+          var isWaterVisible = false;
+
+          el.addEventListener('click', function () {
+            isWaterVisible = !isWaterVisible;
+
+            if (isWaterVisible) {
+              // Show water by setting the scale
+              waterEntities.forEach(function (entity) {
+                entity.setAttribute('scale', '1 1 1');
+              });
+
+              // Start audio playback
+              el.setAttribute('sound', 'src: #gasAudio; autoplay: true; loop: true');
+            } else {
+              // Hide water by setting the scale to 0
+              waterEntities.forEach(function (entity) {
+                entity.setAttribute('scale', '0 0 0');
+              });
+
+              // Stop audio playback
+              el.removeAttribute('sound');
+            }
+          });
+        },
+      });
+
+      //Teleportation 
+      AFRAME.registerComponent('teleportation-up', {
+        init: function () {
+          this.el.addEventListener('click', this.teleport.bind(this, '-0.474 6.3 4.188', '1.444 -268.488 0'));
+        },
+        teleport: function (position, rotation) {
+          var camera = document.getElementById('cameraRig');
+          var audio = document.getElementById('teleport');
       
-      //Tv
+          if (camera) {
+            camera.setAttribute('position', position);
+            camera.setAttribute('rotation', rotation);
+          }
+      
+          if (audio) {
+            audio.play();
+          }
+        }
+      });
+      
+      // Teleportation down 
+      AFRAME.registerComponent('teleportation-down', {
+        init: function () {
+          this.el.addEventListener('click', this.teleport.bind(this, '-4.694 2.200 5.603', '-1.192 544.195 0'));
+        },
+        teleport: function (position, rotation) {
+          var camera = document.getElementById('cameraRig');
+          var audio = document.getElementById('teleport');
+      
+          if (camera) {
+            camera.setAttribute('position', position);
+            camera.setAttribute('rotation', rotation);
+          }
+      
+          if (audio) {
+            audio.play();
+          }
+        }
+      });
+      
+      //Bed door 1 
+      AFRAME.registerComponent('bedroomdoor', {
+        schema: { isOpenBedroom1: { default: false } },
+        init: function () {
+          this.el.addEventListener('click', this.toggleDoor.bind(this));
+        },
+        toggleDoor: function () {
+          var bedroomdoor = document.getElementById('bedroomdoor-1');
+          var isOpenBedroom1 = bedroomdoor.getAttribute('bedroomdoor').isOpenBedroom1;
+
+          bedroomdoor.setAttribute('bedroomdoor', 'isOpenBedroom1', !isOpenBedroom1);
+
+          var animationDuration = 500;  
+          var easing = 'easeInOutQuad';  
+
+          bedroomdoor.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenBedroom1 ? '0 0 0' : '0 -90 0'
+          });
+          bedroomdoor.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenBedroom1 ? '0.3798 4.10988 1.38675' : '0.895 4.090 1.923'
+          });
+      
+          var audioId = isOpenBedroom1 ? 'closeDoorAudio' : 'openDoorAudio';
+          var audio = document.getElementById(audioId);
+
+          if (audio && audio.readyState >= 2) {
+            audio.play();
+          } else {
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
+          }
+        }
+      });
+      
+      //Bathroom door 2
+      AFRAME.registerComponent('bathroomdoor2', {
+        schema: { isOpenBathroom2: { default: false } },
+        init: function () {
+          this.el.addEventListener('click', this.toggleDoor.bind(this));
+        },
+        toggleDoor: function () {
+          var bathroomdoor2 = document.getElementById('bathroomdoor-2');
+          var isOpenBathroom2 = bathroomdoor2.getAttribute('bathroomdoor2').isOpenBathroom2;
+
+          bathroomdoor2.setAttribute('bathroomdoor2', 'isOpenBathroom2', !isOpenBathroom2);
+
+          var animationDuration = 500;  
+          var easing = 'easeInOutQuad';  
+
+          bathroomdoor2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenBathroom2 ? '0 90 0' : '0 180 0'
+          });
+          bathroomdoor2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenBathroom2 ? '0.935 4.10988 2.72942' : '1.34783 4.10988 3.157'
+          });
+
+          var audioId = isOpenBathroom2 ? 'closeDoorAudio' : 'openDoorAudio';
+          var audio = document.getElementById(audioId);
+
+          if (audio && audio.readyState >= 2) {
+            audio.play();
+          } else {
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
+          }
+        }
+      });
+      
+      //Storage door
+      AFRAME.registerComponent('storagedoor2', {
+        schema: { isStoragedoor: { default: false } },
+        init: function () {
+          this.el.addEventListener('click', this.toggleDoor.bind(this));
+        },
+        toggleDoor: function () {
+          var storagedoor2 = document.getElementById('storagedoorsingle-1');
+          var isStoragedoor = storagedoor2.getAttribute('storagedoor2').isStoragedoor;
+
+          storagedoor2.setAttribute('storagedoor2', 'isStoragedoor', !isStoragedoor);
+
+          var animationDuration = 500;  
+          var easing = 'easeInOutQuad';  
+      
+          storagedoor2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isStoragedoor ? '0 0 0' : '0 90 0'
+          });
+          storagedoor2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isStoragedoor ? '0.3798 4.10988 8.55605' : '-0.16798 4.10988 9.09437'
+          });
+
+          var audioId = isStoragedoor ? 'closeDoorAudio' : 'openDoorAudio';
+          var audio = document.getElementById(audioId);
+
+          if (audio && audio.readyState >= 2) {
+            audio.play();
+          } else {
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
+          }
+        }
+      });
+      
+      //bedroom door2
+      AFRAME.registerComponent('bedroomdoor2', {
+        schema: { isBedroomdoor2: { default: false } },
+        init: function () {
+            this.el.addEventListener('click', this.toggleDoor.bind(this));
+        },
+        toggleDoor: function () {
+            var bedroomdoor2 = this.el;
+            var isBedroomdoor2 = bedroomdoor2.getAttribute('bedroomdoor2').isBedroomdoor2;
+    
+            bedroomdoor2.setAttribute('bedroomdoor2', 'isBedroomdoor2', !isBedroomdoor2);
+    
+            var animationDuration = 500;
+            var easing = 'easeInOutQuad';
+    
+            bedroomdoor2.setAttribute('animation__rotation', {
+                property: 'rotation',
+                dur: animationDuration,
+                easing: easing,
+                to: isBedroomdoor2 ? '0 180 0' : '0 270 0'
+            });
+            bedroomdoor2.setAttribute('animation__position', {
+                property: 'position',
+                dur: animationDuration,
+                easing: easing,
+                to: isBedroomdoor2 ? '-10.56676 4.156 8.81517' : '-10.5426 4.11 8.754'
+            });
+    
+            var audioId = isBedroomdoor2 ? 'closeDoorAudio' : 'openDoorAudio';
+            var audio = document.getElementById(audioId);
+    
+            if (audio && audio.readyState >= 2) {
+                audio.play();
+            } else {
+                audio.addEventListener('loadeddata', function () {
+                    audio.play();
+                });
+            }
+        }
+      });    
+    
+      //Bathroom door 3 
+      AFRAME.registerComponent('bathroomdoor3', {
+        schema: { isBathroomdoor3: { default: false } },
+        init: function () {
+            this.el.addEventListener('click', this.toggleDoor.bind(this));
+        },
+        toggleDoor: function () {
+            var bathroomdoor3 = this.el;
+            var isBathroomdoor3 = bathroomdoor3.getAttribute('bathroomdoor3').isBathroomdoor3;
+    
+            bathroomdoor3.setAttribute('bathroomdoor3', 'isBathroomdoor3', !isBathroomdoor3);
+    
+            var animationDuration = 500;
+            var easing = 'easeInOutQuad';
+    
+            bathroomdoor3.setAttribute('animation__rotation', {
+                property: 'rotation',
+                dur: animationDuration,
+                easing: easing,
+                to: isBathroomdoor3 ? '0 180 0' : '0 90 0'
+            });
+            bathroomdoor3.setAttribute('animation__position', {
+                property: 'position',
+                dur: animationDuration,
+                easing: easing,
+                to: isBathroomdoor3 ? '-7.98797 4.156 8.81517' : '-7.99823 4.156 8.91641'
+            });
+    
+            var audioId = isBathroomdoor3 ? 'closeDoorAudio' : 'openDoorAudio';
+            var audio = document.getElementById(audioId);
+    
+            if (audio && audio.readyState >= 2) {
+                audio.play();
+            } else {
+                audio.addEventListener('loadeddata', function () {
+                    audio.play();
+                });
+            }
+        }
+      });    
+
+      //Workroom door
+      AFRAME.registerComponent('workroom', {
+        schema: { isWorkroomdoor: { default: false } },
+        init: function () {
+            this.el.addEventListener('click', this.toggleDoor.bind(this));
+        },
+        toggleDoor: function () {
+            var workroomdoor = this.el;
+            var isWorkroomdoor = workroomdoor.getAttribute('workroom').isWorkroomdoor;
+    
+            workroomdoor.setAttribute('workroom', 'isWorkroomdoor', !isWorkroomdoor);
+    
+            var animationDuration = 500;
+            var easing = 'easeInOutQuad';
+    
+            workroomdoor.setAttribute('animation__rotation', {
+                property: 'rotation',
+                dur: animationDuration,
+                easing: easing,
+                to: isWorkroomdoor ? '0 180 0' : '0 270 0'
+            });
+            workroomdoor.setAttribute('animation__position', {
+                property: 'position',
+                dur: animationDuration,
+                easing: easing,
+                to: isWorkroomdoor ? '-4.28127 4.156 8.81517' : '-4.23575 4.156 8.76495'
+            });
+    
+            var audioId = isWorkroomdoor ? 'closeDoorAudio' : 'openDoorAudio';
+            var audio = document.getElementById(audioId);
+    
+            if (audio && audio.readyState >= 2) {
+                audio.play();
+            } else {
+                audio.addEventListener('loadeddata', function () {
+                    audio.play();
+                });
+            }
+        }
+      });
+    
+      //shower2
+      
+
     </script>
     <!---===========================================================================JS end=========================================================================-->
 
-     <!--Entrance doors-->
-    <!-- Door left -->
-    <a-entity id="double-door-1" class="intersectable" static-body="" position="-9.17592 0.52224 3.31"
-    gltf-model="#double-door" scale="1.5 1.2 1.485" rotation="0 270 0" door></a-entity>
 
-    <!-- Door right -->
-    <a-entity id="double-door-2" class="intersectable" static-body="" position="-10.687 0.51933 3.31"
-    gltf-model="#double-door" scale="1.5 1.2 1.485" rotation="0 90 0" door></a-entity>
-
-  <!--=========================================================================================-->
-
-    <!-- Back doors -->
-    <a-entity id="back-double-door-1" class="intersectable" static-body="" position="-0.11894 0.55543 10.013"
-    gltf-model="#double-door" scale="1.5 1.15 1.55" rotation="0 90 0" backdoor></a-entity>
-
-    <a-entity id="back-double-door-2" class="intersectable" static-body="" position="1.45762 0.55543 10.013"
-    gltf-model="#double-door" scale="1.5 1.15 1.55" rotation="0 270 0" backdoor></a-entity>
-
-  <!--=========================================================================================-->
-
-    <!-- Pool door -->
-    <a-entity id="pool-door" class="intersectable" static-body="" position="-9.62711 1.83002 8.82728"
-    gltf-model="#single-door" scale="0.26 0.2 0.58" rotation="0 180 0" pooldoor></a-entity>
-
-  <!--=========================================================================================-->  
-
-    <!-- Bathroom door -->
-    <a-entity id="bathroom-door-1" class="intersectable" static-body="" position="-1.48867 0.54 8.63875"
-    gltf-model="#door" scale="0.2 0.3 0.3" rotation="0 180 0" bathroomdoor></a-entity>
-
-  <!--=========================================================================================-->
-
-    <!-- Fridge doors -->
-    <a-entity id="fridge-door-1" class="intersectable" static-body="" position="-0.22207 1.86745 2.12807"
-    geometry="depth: 0.75; height: 2.57; width: 0.06" material="src: images/fridge-door.jpg; repeat: 0 2"
-    rotation="0 0 0" scale="1 1 1" fridgedoor></a-entity>
-
-    <a-entity id="fridge-door-2" class="intersectable" static-body="" position="-0.22207 1.86714 1.3806"
-    geometry="depth: 0.75; height: 2.57; width: 0.06" material="src: images/fridge-door.jpg; repeat: 0 2"
-    rotation="0 0 0" scale="1 1 1" fridgedoor></a-entity>
-
-    <!-- Handles -->
-    <a-entity id="handle1" class="intersectable" static-body="" geometry="depth: 0.05; width: 0.05"
-    position="-0.09834 2.0126 1.90948" material="src: images/metal-solid.jpg" rotation="0 0 0" scale="1 1 1.2" fridgedoor></a-entity>
-
-    <a-entity id="handle2" class="intersectable" static-body="" geometry="depth: 0.05; width: 0.05"
-    position="-0.09834 2.0126 1.60382" material="src: images/metal-solid.jpg" rotation="0 0 0" scale="1 1 1.2" fridgedoor></a-entity>
-
-  <!--=========================================================================================-->
-
-    <!-- small storage door -->
-    <a-entity id="small-storage-door-1"  static-body=""
-    geometry="depth: 0.44; height: 1.05; width: 0.02" position="-0.49617 3.43639 -1.36877"
-    material="src: images/dark-texture.jpg" rotation="0 90 0" scale="1 1 1.2" smallstoragedoor></a-entity>
-
-    <a-entity id="small-storage-door-2"  static-body=""
-    geometry="depth: 0.44; height: 1.05; width: 0.02" position="0.03015 3.43639 -1.36877"
-    material="src: images/dark-texture.jpg" rotation="0 90 0" scale="1 1 1.2" smallstoragedoor ></a-entity>
-
-    <!--small storage handle -->
-    <a-entity id="handle-small-storage-1" static-body="" geometry="depth: 0.01; height: 0.2; width: 0.05" position="-0.08669 3.50788 -1.29269"
-    material="src: images/white.jpg" rotation="" scale="1 1 1.2" smallstoragedoor></a-entity>
-    <a-entity id="handle-small-storage-2" static-body="" geometry="depth: 0.01; height: 0.2; width: 0.05" position="-0.38846 3.50788 -1.29269" material="src: images/white.jpg" rotation="" scale="1 1 1.2" smallstoragedoor></a-entity>
-
-  <!--=========================================================================================-->
-
-    <!--Storage door-->
-    <a-entity  id="storage-door-1" class="intersectable" static-body="" geometry="height: 3.5; width: 0.05" position="-0.7869 2.32204 -0.47444"
-    material="src: images/shiny-black.jpg; repeat: 0 1" rotation="0 90 0" scale="1 1 1.2"  storagedoor></a-entity>
-    <a-entity id="storage-door-2" class="intersectable" static-body="" geometry="height: 3.5; width: 0.05" position="0.41011 2.32204 -0.47444"
-      material="src: images/shiny-black.jpg; repeat: 0 1" rotation="0 90 0" scale="1 1 1.2" storagedoor></a-entity>
-
-    <!-- Handles of inside storage -->
-    <a-entity id="handle-storage-1"  class="intersectable" static-body=""
-    geometry="depth: 0.1; height: 0.5; width: 0.05" position="-0.43765 2.32204 -0.44493"
-    material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" storagedoor></a-entity>
-
-    <a-entity id="handle-storage-2" class="intersectable" static-body=""
-    geometry="depth: 0.1; height: 0.5; width: 0.05" position="0.02765 2.32204 -0.44493"
-    material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" storagedoor></a-entity>
-
-  <!--=========================================================================================-->
-    <!-- Boxes door 1 -->
-    <a-entity id="boxes-door-1" class="intersectable" static-body=""
-    geometry="depth: 0.55; height: 0.87; width: 0.02" position="1.9548 1.10462 -0.91695"
-    material="src: images/dark-texture.jpg" rotation="0 90 0" scale="1 1 1.2" boxesdoor></a-entity>
-
-    <!-- Boxes Handle 1 -->
-    <a-entity id="handle-boxes-1" class="intersectable" static-body=""
-    geometry="depth: 0.03; height: 0.3; width: 0.02" position="2.01904 1.43714 -0.88374"
-    material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2" boxesdoor></a-entity>
-
-    <!--Boxes door 2-->
-    <a-entity id="boxes-door-2" static-body="" geometry="depth: 0.64; height: 1.4; width: 0.02" position="1.9548 2.24583 -0.90258"
-    material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor2></a-entity>
-    <!--Boxes Handle 2-->
-    <a-entity id="handle-boxes-2" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="2.01904 1.62829 -0.88374"
-      material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2" boxesdoor2></a-entity>
-
-    <!--Boxes door 3-->
-    <a-entity id="boxes-door-3" static-body="" geometry="depth: 0.64; height: 0.65; width: 0.02" position="1.9548 3.26608 -0.9025"
-      material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor3></a-entity>
-
-    <!--Boxes Handle 3-->
-    <a-entity id="handle-boxes-3" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="2.01904 3.04595 -0.88374"
-      material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2" boxesdoor3></a-entity>
-
-    <!--Boxes door 4-->
-    <a-entity id="boxes-door-4" static-body="" geometry="depth: 0.71; height: 1.23; width: 0.02" position="2.62905 2.96795 -0.917"
-    material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor4></a-entity>
-
-    <!--Boxes Handle 4-->
-    <a-entity id="handle-boxes-4" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="2.86394 2.64347 -0.88374"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" boxesdoor4></a-entity>
-
-    <!--Boxes door 5-->
-    <a-entity id="boxes-door-5" static-body="" geometry="depth: 0.69; height: 0.91; width: 0.02" position="3.33715 2.79565 -0.917"
-      material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor5></a-entity>
-
-    <!--Boxes Handle 5-->
-    <a-entity id="handle-boxes-5" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="3.0935 2.64347 -0.88374"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" boxesdoor5></a-entity>
-
-    <!--Boxes door 6-->
-    <a-entity id="boxes-door-6" static-body="" geometry="depth: 0.69; height: 0.91; width: 0.02" position="4.0313 2.79565 -0.917"
-    material="src: images/dark-texture.jpg" rotation="0 90 0" boxesdoor6></a-entity>
-
-    <!--Boxes  Handle 6-->
-    <a-entity id="handle-boxes-6" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="3.79911 2.64347 -0.88374"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" boxesdoor6></a-entity>
-
-    <!--Boxes door 7-->
-    <a-entity id="boxes-door-7" static-body="" geometry="depth: 1.1; height: 0.8; width: 0.02" position="3.69441 1.0734 -0.36638"
-      material="src: images/dark-texture.jpg" rotation="0.01 0 0" boxesdoor7></a-entity>
-
-    <!--Boxes  Handle 7-->
-    <a-entity id="handle-boxes-7" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="3.67654 1.08804 -0.00156"
-    material="src: images/metal-solid.jpg" rotation="" scale="1 1 1.2" boxesdoor7></a-entity>
-
-    <!--Boxes door 8-->
-    <a-entity id="boxes-door-8" static-body="" geometry="depth: 0.55; height: 0.8; width: 0.02" position="3.69441 1.0734 1.81199"
-      material="src: images/dark-texture.jpg" rotation="0.01 0 0" boxesdoor8></a-entity>
-
-    <!--Boxes  Handle 8-->
-    <a-entity  id="handle-boxes-8" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="3.67654 1.08804 1.63343"
-      material="src: images/metal-solid.jpg" rotation="" scale="1 1 1.2" boxesdoor8></a-entity>
-
-  <!--=========================================================================================-->
-    <!-- TV -->
-    <a-entity id="tvScreen" static-body geometry="depth: 2; height: 1.2; width: 0.02" position="-12.55001 2.13166 8.46826"
-    material="side:double; src: images/tv.png; shader: flat" scale="" rotation="0 90 0" tv>
-    <a-video id="tvVideo" src="#tv-video" width="2" height="1.2" loop="true" scale="0 0 0" position = "0.014 0 0" rotation="0 90  0"></a-video>
-    <a-video id="ps5Video" src="#ps5-video" width="2" height="1.2" loop="true" scale="0 0 0" rotation = "0 90 0" position = "0.014 0 0"></a-video>
-     </a-entity>
-  
-    <!-- Audio -->
-    <a-entity id="speaker1" static-body geometry="depth: 0.3; height: 0.5; width: 0.02" position="-13.75919 2.39557 8.51467"
-    material="src: images/speaker.jpg" scale="" rotation="0 90 0"></a-entity>
-
-    <a-entity id="speaker2" static-body geometry="depth: 0.3; height: 0.5; width: 0.02" position="-11.33162 2.38937 8.51384"
-    material="src: images/speaker.jpg" scale="" rotation="0 90 0"></a-entity>
-        
-    <!-- Ps5 with Video -->
-    <a-entity id="ps5Entity" gltf-model="#ps5" position="-11.22127 1.34128 8.34235" scale="0.5 0.5 0.5" rotation="0 90 0" ps5>
-    <a-entity gltf-model="#controller" position="-11.30797 1.43551 8.09191" scale="0.5 0.5 0.5"
-      rotation="-65 45 0"></a-entity>
-    </a-entity>
     <!-- Tiny Walls -->
     <a-entity class="intersectable" static-body="" geometry="depth: 10; height: 1.22; width: 0.06"
       position="2.18705 0.94 -5.656" material="src: images/tiny-wall.jpg; repeat: 4 1" rotation="0 90 0"></a-entity>
@@ -896,32 +2039,23 @@
       rotation="0 90 0"></a-entity>
     <!---Staircases-->
     <a-entity static-body="" geometry="depth: 1.02; height: 0.5; width: 0.31" position="-4.59875 0.73724 4.99527"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <a-entity static-body="" geometry="depth: 1.02; height: 1.5; width: 0.3" position="-4.60396 1.04083 4.12511"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-3.82192 1.39396 4.11172"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-3.45752 1.80964 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-3.10447 2.229 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-2.74308 2.62707 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-2.37939 3.0393 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-2.02284 3.45494 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <a-entity static-body="" geometry="depth: 0.45; height: 1.5; width: 0.42" position="-1.58603 3.86743 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"
-      class="intersectable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <!--Lamp-->
     <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-2.31223 0.51971 -2.45745" scale="0.2 0.2 0.2"
       rotation="0 180 0"></a-entity>
@@ -998,17 +2132,29 @@
       material="src: images/wooden-floor.jpg; repeat: 20 20"></a-entity>
 
     <!--Fridge-->
-    <a-entity static-body="" geometry="depth: 1.23; height: 1.1; width: 0.1" position="-0.81274 0.59016 1.73359" material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 1.23; height: 1.1; width: 0.05" position="-0.762 3.1194 1.73993" material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.91; height: 2.5; width: 0.05" position="-0.796 1.84355 2.441" material="src: images/white.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.91; height: 2.5; width: 0.05" position="-0.80627 1.84244 1.03269" material="src: images/white.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.4; width: 0.01" position="-0.82979 2.88927 1.91741" material="src: images/white.jpg" rotation="90 0 90" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.01" position="-0.82979 2.65022 1.72799" material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.05" position="-0.82979 2.17659 1.72799" material="color: #ffffff; roughness: 0.001" rotation="0 0 90" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.01" position="-0.82979 1.75015 1.72799" material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.01" position="-0.82979 1.34457 1.72799" material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.01" position="-0.82979 1.02144 1.72799" material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
-    <a-entity geometry="width: 0.02; height: 0.38; depth: 1.38" material="color: #f2f2f2; opacity: 0.7; transparent: true; roughness: 0.1" position="-0.31012 0.82506 1.73806" rotation=""></a-entity>
+    <a-entity static-body="" geometry="depth: 1.23; height: 1.1; width: 0.1" position="-0.81274 0.59016 1.73359"
+      material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 1.23; height: 1.1; width: 0.05" position="-0.762 3.1194 1.73993"
+      material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 0.91; height: 2.5; width: 0.05" position="-0.796 1.84355 2.441"
+      material="src: images/white.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 0.91; height: 2.5; width: 0.05" position="-0.80627 1.84244 1.03269"
+      material="src: images/white.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 0.4; width: 0.01" position="-0.82979 2.88927 1.91741"
+      material="src: images/white.jpg" rotation="90 0 90" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.01" position="-0.82979 2.65022 1.72799"
+      material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.05" position="-0.82979 2.17659 1.72799"
+      material="color: #ffffff; roughness: 0.001" rotation="0 0 90" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.01" position="-0.82979 1.75015 1.72799"
+      material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.01" position="-0.82979 1.34457 1.72799"
+      material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
+    <a-entity static-body="" geometry="depth: 1.15; height: 1.1; width: 0.01" position="-0.82979 1.02144 1.72799"
+      material="src: images/white.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
+    <a-entity geometry="width: 0.02; height: 0.38; depth: 1.38"
+      material="color: #f2f2f2; opacity: 0.7; transparent: true; roughness: 0.1" position="-0.31012 0.82506 1.73806"
+      rotation=""></a-entity>
     <!--wall left-->
     <a-entity static-body="" geometry="depth: 7; height: 3.5; width: 0.15" position="4.463 2.332 1.48317"
       material="src: images/stone-wall.jpg"></a-entity>
@@ -1207,9 +2353,7 @@
       material="src: images/w-shower.jpg; repeat: 3 3" rotation="" scale="1 1 1.2"></a-entity>
 
     <!--===========================================Bathroom 1====================================================-->
-    <!--toilet-->
-    <a-entity gltf-model="#toilet" position="-2.37137 0.54 9.54463" scale="0.015 0.015 0.015"
-      rotation="0 180 0"></a-entity>
+
 
     <!--Glass-->
     <a-entity geometry="width: 0.02; height: 0.75; depth: 0.7"
@@ -1219,10 +2363,6 @@
       position="-2.34896 2.12456 7.73627" rotation="0 90 90"></a-entity>
     <a-entity geometry="width: 0.02; height: 0.2; depth: 0.7" material=" src: images/black.jpg"
       position="-1.89485 2.47757 7.73627" rotation="90 90 90"></a-entity>
-
-    <!--Sink-->
-    <a-entity gltf-model="#b-sink" position="-2.36728 1.62329 7.96671" scale="0.012 0.015 0.015"
-      rotation="0 270 0"></a-entity>
 
     <!--Bath-->
     <a-entity static-body="" geometry="depth: 1.2; height: 0.05; width: 2.4" position="-3.6909 0.59206 8.75198"
@@ -1269,21 +2409,6 @@
     <a-entity static-body="" geometry="depth: 0.35; height: 0.35; width: 0.005" position="-3.72264 3.52392 9.44987"
       material="src: images/shower.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
 
-    <!--heat modify-->
-    <a-entity static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="-3.40739 1.93256 9.92524"
-      material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.06"
-      position="-3.40613 1.86724 9.89169" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-3.29154 2.00786 9.89169" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-3.40976 2.00786 9.89169" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-3.52019 2.00786 9.89169" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
     <!--==========================================================Pool=====================================================================-->
 
     <!---Shower box-->
@@ -1301,9 +2426,6 @@
       material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.1; height: 0.1; width: 0.01" position="-3.71703 3.58456 10.1226"
       material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.5; primitive: cylinder; radius: 0.03"
-      position="-3.71465 3.59234 10.34337" material="src: images/steel.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.07; height: 0.1; width: 0.1" position="-3.71703 3.58456 10.57169"
       material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.2; height: 0.2; width: 0.01" position="-3.72264 3.5409 10.56573"
@@ -1315,8 +2437,7 @@
     <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.08"
       position="-3.37318 1.92645 10.1278" material="src: images/metal-solid.jpg" rotation="90 0 0"
       scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="-3.38253 1.93131 10.09689"
-      material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
+
 
     <!--pool frame-->
     <a-entity static-body="" geometry="height: 8; width: 0.01; depth: 0.45" position="-10.89212 0.59565 10.64957"
@@ -1567,16 +2688,12 @@
     <a-entity static-body="" geometry="depth: 3.5; height: 0.2; width: 0.15" position="-14.562 7.43032 14.1445"
       material="src: images/stone-wall.jpg" scale="" rotation=""></a-entity>
     <!--==========Bedroom1===========-->
-    <a-entity gltf-model="#bed" position="1.96958 4.467 0.37234" scale="5 5 5.5" rotation=""></a-entity>
+    <a-entity gltf-model="#bed" position="1.71631 4.467 0.76465" scale="5.5 6.2 6.2" rotation=""></a-entity>
     <a-entity static-body="" geometry="depth: 5.2; height: 3.5; width: 0.15" position="0.36681 5.779 4.57749"
       material="src: images/stone-wall.jpg"></a-entity>
     <a-entity static-body="" geometry="depth: 2.8; height: 3.5; width: 0.15" position="0.36681 5.779 -0.60671"
       material="src: images/stone-wall.jpg"></a-entity>
 
-    <!--2nd door-->
-    <a-entity gltf-model="#door" position="0.3798 4.10988 1.38675" scale="0.3 0.3 0.3" rotation=""></a-entity>
-    <a-entity gltf-model="#door" position="0.935 4.10988 2.72942" scale="0.3 0.3 0.25" rotation="0 90 0"></a-entity>
-    <a-entity gltf-model="#door" position="0.3798 4.10988 8.55605" scale="0.3 0.3 0.3" rotation=""></a-entity>
     <!--Tv Table-->
     <a-entity static-body="" geometry="height: 1.4; width: 0.15; depth: 0.5" position="2.69992 4.79719 2.38243"
       material="src: images/leather.jpg; repeat: 40 40" scale="" rotation="0 0 90"></a-entity>
@@ -1653,23 +2770,6 @@
     <a-entity static-body="" geometry="depth: 0.07; height: 0.42; width: 0.01" position="2.83433 6.22781 6.8172"
       material="src: images/shower.jpg" rotation="0 90 -10" scale="1 1 1.2"></a-entity>
 
-
-    <!---Heat modifier-->
-    <a-entity static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="3.84412 5.88993 7.04127"
-      material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.06"
-      position="3.84771 5.81581 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="3.96046 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="3.85295 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="3.74866 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2"></a-entity>
-
     <!--Waredrobe-->
     <a-entity static-body="" geometry="depth: 1.95; height: 3; width: 0.02" position="1.39534 5.62826 7.0219"
       material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
@@ -1711,9 +2811,9 @@
       material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
 
     <!--Rug-->
-    <a-entity static-body="" geometry="height: 4; width: 0.01; depth: 4.6" position="2.41144 4.13922 0.40447"
+    <a-entity static-body="" geometry="height: 4.140; width: 0.01; depth: 4.6" position="2.380 4.13922 0.40447"
       material="src: images/dining-rug.jpg; repeat: 6 6" scale="" rotation="0 0 90"></a-entity>
-    <a-entity static-body="" geometry="height: 2; width: 0.01; depth: 4.3" position="1.39057 4.13922 4.90158"
+    <a-entity static-body="" geometry="height: 2; width: 0.01; depth: 4.3" position="1.39057 4.13922 4.849"
       material="src: images/dining-rug.jpg; repeat: 6 6" scale="" rotation="0 0 90"></a-entity>
 
     <!--==========Bedroom2============-->
@@ -1825,11 +2925,8 @@
     <a-entity static-body="" geometry="depth: 2; height: 1.2; width: 0.02" position="-10.51476 6.59185 11.53336"
       material="src: images/tv.png" scale="" rotation=""></a-entity>
     <!--rug-->
-    <a-entity static-body="" geometry="height: 4.4; width: 0.01; depth: 7" position="-12.42707 4.13922 12.32836"
+    <a-entity static-body="" geometry="height: 4.4; width: 0.01; depth: 7" position="-12.42707 4.13922 12.261"
       material="src: images/dining-rug.jpg; repeat: 6 6" scale="" rotation="0 0 90"></a-entity>
-
-    <!--Door-->
-    <a-entity gltf-model="#door2" position="-10.56676 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0"></a-entity>
 
     <!--=============================================Work room=======================================================-->
     <a-entity static-body="" geometry="height: 3.5; width: 0.15" position="-3.77812 5.779 8.8339"
@@ -1978,9 +3075,6 @@
     <a-entity gltf-model="#drawer" position="-3.73615 4.6755 14.84935" scale="1.5 1.6 2" rotation="0 180 0"></a-entity>
     <a-entity gltf-model="#drawer" position="-3.70117 4.8333 10.7394" scale="2 2 1" rotation="0 270 0"></a-entity>
 
-    <!--door-->
-    <a-entity gltf-model="#door2" position="-4.28127 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0"></a-entity>
-
     <!--rug-->
     <a-entity static-body="" geometry="height: 3.4; width: 0.01; depth: 7" position="-5.11296 4.13922 12.32836"
       material="src: images/dining-rug.jpg; repeat: 6 6" scale="" rotation="0 0 90"></a-entity>
@@ -2106,8 +3200,6 @@
       rotation="0 270 0"></a-entity>
     <!--Sink-->
     <a-entity gltf-model="#b-sink" position="-9.83049 5.19579 9.81031" scale="0.012 0.015 0.015" rotation=""></a-entity>
-    <!--door-->
-    <a-entity gltf-model="#door2" position="-7.98797 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0"></a-entity>
 
     <!--stair-->
     <a-entity static-body="" geometry="depth: 1.5; height: 3.5; width: 0.04" position="-5.24208 2.29 4.015"
@@ -2267,12 +3359,14 @@
       material="src: images/dark-texture.jpg" rotation="0 90.01 90"></a-entity>
     <a-entity static-body="" geometry="height: 3; width: 0.02" position="2.2752 2.084 -1.409"
       material="src: images/dark-texture.jpg"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.7; height: 3; width: 0.02" position="1.95727 2.08415 -1.88796" material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
+    <a-entity static-body="" geometry="depth: 0.7; height: 3; width: 0.02" position="1.95727 2.08415 -1.88796"
+      material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
 
     <!--Box Above Sink-->
     <a-entity static-body="" geometry="depth: 2.15; height: 1.25; width: 0.02" position="3.31212 2.96743 -1.88796"
       material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
-      <a-entity static-body="" geometry="depth: 2.8; width: 0.02" position="2.99259 3.589 -1.398" material="src: images/dark-texture.jpg" rotation="0 90.01 90"></a-entity>
+    <a-entity static-body="" geometry="depth: 2.8; width: 0.02" position="2.99259 3.581 -1.398"
+      material="src: images/dark-texture.jpg" rotation="0 90.01 90"></a-entity>
     <a-entity static-body="" geometry="depth: 2.15; width: 0.02" position="3.32426 2.351 -1.398"
       material="src: images/dark-texture.jpg" rotation="0 90.01 90"></a-entity>
     <a-entity static-body="" geometry="height: 1.23; width: 0.02" position="2.98414 2.96169 -1.40863"
@@ -2337,9 +3431,6 @@
     <a-entity static-body="" geometry="height: 0.85; width: 0.02; depth: 4" position="4.37964 1.08453 0.09193"
       material="src: images/dark-texture.jpg"></a-entity>
 
-    <!--Stove-->
-    <a-entity gltf-model="#stove" position="4.40658 0.54527 0.5997" scale="1.1 1.1 1.1" rotation="0 180 0"></a-entity>
-
     <!--Stove's Door-->
     <a-entity static-body="" geometry="depth: 0.53; height: 0.2; width: 0.02" position="3.69441 1.37359 1.27983"
       material="src: images/dark-texture.jpg" rotation="0.01 0 0"></a-entity>
@@ -2347,7 +3438,7 @@
       material="src: images/dark-texture.jpg" rotation="0.01 0 0"></a-entity>
     <a-entity static-body="" geometry="depth: 0.52; height: 0.34; width: 0.02" position="3.68309 0.85139 1.27983"
       material="src: images/dark-texture.jpg" rotation="0.01 0 0"></a-entity>
-  
+
 
     <!--Stove handles-->
     <a-entity static-body="" geometry="depth: 0.03; height: 0.15; width: 0.02" position="3.677 1.41979 1.2762"
