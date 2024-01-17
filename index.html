@@ -78,18 +78,18 @@
 
 
       <!--Video-->
-      <video id="tv-video" src="videos/tv.mp4" loop></video>
+      <video id="tv-video" src="videos/tv-video.mp4" loop></video>
       <video id="ps5-video" src="videos/ps5.mp4" loop></video>
+      <video id="tv-video2" src="videos/tv-video2 .mp4" loop></video>
+      <video id="tv-video3" src="videos/tv-video3.mp4" loop></video>
     </a-assets>
 
     <a-light type="directional" position="1 50 -2" target="#ground" castShadow="true"></a-light>
 
-    <!-- Camera Rig with Raycaster -->
     <a-entity camera="" id="cameraRig" position="-7.895 2.2 -18.43716" rotation="0 90 0"
       wasd-controls="acceleration: 30" look-controls="pointerLockEnabled: true; touchEnabled: false">
 
-      <!-- Cursor entity should be a child of the camera entity -->
-      <a-entity cursor="fuse: true; fuseTimeout: 1000; rayOrigin: mouse" raycaster="far: 10; objects: .intersectable">
+      <a-entity cursor="fuse: true; fuseTimeout: 0; rayOrigin: mouse" raycaster="far: 4; objects: .intersectable" position="0.1 0 0"></a-entity>
         <a-entity position="0 0 -0.75">
           <!-- Horizontal line of the cross -->
           <a-plane width="0.05" height="0.005" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
@@ -98,7 +98,6 @@
           <a-plane width="0.005" height="0.05" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
             geometry=""></a-plane>
         </a-entity>
-      </a-entity>
     </a-entity>
 
 
@@ -380,7 +379,6 @@
         material="shader: flat; side: double; transparent: true; src: #smoke"
         animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 800; loop: true"></a-entity>
 
-
       <a-entity geometry="primitive: plane; height: 0.15; width: 0.15" position="0 0.095 0" rotation="0 90 0"
         material="shader: flat; side: double; transparent: true; src: #smoke"
         animation__position="property: position; to: 0 0.6 0; easing: linear; dur: 1000; loop: true"></a-entity>
@@ -475,19 +473,12 @@
     </a-entity>
 
     <!--Tele up -->
-    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-5.20485 2.345 4.44403"
-      material="src: #black" scale="" rotation="0 0 0.01" teleportation-up></a-entity>
-
-    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.1"
-      position="-5.16097 2.345 4.44403" material="src: #steel" scale="" rotation="0 0 90" teleportation-up></a-entity>
+    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-1.963 5.85 3.4191" material="src: #black" scale="1.5 2 2" rotation="0 90 0.01" teleportation-down></a-entity>
+    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.25" position="-1.96863 5.84108 3.4684" material="src: #steel" scale="" rotation="0 90 90" teleportation-down></a-entity>
 
     <!--tele down-->
-    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-1.9633 5.85016 3.39505"
-      material="src: #black" scale="" rotation="0 90 0.01"
-      teleportation-down></a-entity>
-    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.1"
-      position="-1.96863 5.84108 3.42424" material="src: #steel" scale="" rotation="0 90 90"
-      teleportation-down></a-entity>
+    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-5.20485 2.345 4.41982" material="src: #black" scale="1 2 2" rotation="0 0 0.01" teleportation-up></a-entity>
+    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.25" position="-5.16097 2.345 4.44403" material="src: #steel" scale="" rotation="0 0 90" teleportation-up></a-entity>
 
     <!-- Bedroom door -->
     <a-entity class="intersectable" id="bedroomdoor-1" gltf-model="#door" position="0.3798 4.10988 1.38675" scale="0.3 0.3 0.3" rotation="" bedroomdoor></a-entity>
@@ -508,7 +499,6 @@
     <a-entity class="intersectable" id="workroomdoor" gltf-model="#door2" position="-4.28127 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0" workroom></a-entity>
 
     <!--Shower 2-->
-    <!---Heat modifier-->
     <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="3.84412 5.88993 7.04127"
       material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2" shower2></a-entity>
     <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
@@ -521,7 +511,78 @@
       position="3.74866 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
       scale="1 1 1.2" shower2></a-entity>
 
+    <a-entity id="shower-water-3" geometry="width: 0.35; height: 3; depth: 0.35" material="color: #00ace6; opacity: 0.7; transparent: true; roughness: 0.1" position="3.36582 5.42514 6.57116" rotation="0 90 0" scale="0 0 0" sound="src: #showerAudio"></a-entity>
+    
+    <!--Shower 3-->
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.06"
+    position="-7.04681 5.9701 10.88364" material="src: images/metal-solid.jpg" rotation="90 0 90"
+    scale="1 1 1.2" shower3></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="-7.00462 6.03595 10.88698"
+      material="src: images/steel.jpg" rotation="" scale="1 1 1.2" shower3></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="-7.04681 6.11457 10.78262" material="src: images/metal-solid.jpg" rotation="90 0 90"
+      scale="1 1 1.2" shower3></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="-7.04681 6.11457 10.88364" material="src: images/metal-solid.jpg" rotation="90 0 90"
+      scale="1 1 1.2" shower3></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
+      position="-7.04681 6.11457 10.98175" material="src: images/metal-solid.jpg" rotation="90 0 90"
+      scale="1 1 1.2" shower3></a-entity>
 
+    <a-entity id="shower-water-4" geometry="width: 0.35; height: 3; depth: 0.35" material="color: #00ace6; opacity: 0.7; transparent: true; roughness: 0.1" position="-7.50161 5.44642 11.37197" rotation="" scale="0 0 0" sound="src: #showerAudio"></a-entity>
+    
+    <!--Toilet 2-->
+    <a-entity id="toiletEntity2" class="intersectable"  gltf-model="#toilet" position="3.6774 4.13491 3.18287" scale="0.015 0.015 0.015" rotation="" sound="on: click; src: #toiletAudio"></a-entity>
+
+    <!--Toilet 3-->
+    <a-entity id="toiletEntity3" class="intersectable" gltf-model="#toilet" position="-7.27823 4.14115 9.54463" scale="0.015 0.015 0.015"
+      rotation="0 270 0" sound="on: click; src: #toiletAudio"></a-entity>
+
+    <!--Sink2-->
+    <a-entity id="bathroomsink2" class="intersectable" gltf-model="#b-sink" position="-9.83049 5.19579 9.81031" scale="0.012 0.015 0.015" rotation="" bathroomsink2></a-entity>
+    <a-entity id="water2-4" geometry="height: 0.03; depth: 0.66; width: 0.29" material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="-9.83709 5.31611 9.80461" scale="0 0 0"></a-entity>
+    <a-entity id="water2-3" geometry="height: 0.24; primitive: cylinder; radius: 0.01" material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="-9.88269 5.4089 9.80461" scale="0 0 0"></a-entity>
+
+    <!--Tv2-->
+    <a-entity id="tvScreen2" class="intersectable" static-body="" geometry="depth: 2; height: 1.2; width: 0.02" position="2.71119 5.779 2.52708"
+    material="src: images/tv.png" scale="" rotation="0 90 0" tv2 >
+    <a-video id="tvVideo2" src="#tv-video2" width="2" height="1.2" loop="true" scale="0 0 0" position="0.014 0 0"
+    rotation="0 90  0"></a-video></a-entity>
+
+    <!--Tv3-->
+    <a-entity id="tvScreen3" class="intersectable" static-body="" geometry="depth: 2; height: 1.2; width: 0.02" position="-10.51476 6.59185 11.53336"
+    material="src: images/tv.png" scale="" rotation=""  tv3>
+    <a-video id="tvVideo3" src="#tv-video3" width="2" height="1.2" loop="true" scale="0 0 0" position="-0.014 0 0"   rotation="0 90  0"></a-video>
+    </a-entity>
+
+    <!--bedroom drawer-->
+    <a-entity id="bedroom-drawerdoor-1" class="intersectable" static-body="" geometry="depth: 0.63; height: 1.93; width: 0.02" position="-10.67799 6.16619 14.81062"
+    material="src: images/dark-texture.jpg"  rotation="0 90 0" drawer></a-entity>
+    <a-entity id="bedroom-drawerdoor-2" class="intersectable"   static-body="" geometry="depth: 0.62; height: 1.93; width: 0.02" position="-11.30407 6.16619 14.81062"
+    material="src: images/dark-texture.jpg" rotation="0 90 0" drawer></a-entity>
+    
+    <!--drawer handles-->
+    <a-entity id="bedroom-drawerhandle-1" class="intersectable"  static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="-10.85146 6.0617 14.76944"
+    material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" drawer></a-entity>
+    <a-entity id="bedroom-drawerhandle-2" class="intersectable"  static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="-11.15203 6.0617 14.76944"
+      material="src: images/metal-solid.jpg" rotation="0 180 0" scale="1 1 1.2" drawer></a-entity>
+
+    <!--Waredrobe 1-->
+    <a-entity id="waredrobe-1" class="intersectable" static-body="" geometry="depth: 0.64; height: 2.98; width: 0.02" position="2.04402 5.62826 6.08177"
+      material="src: images/dark-texture.jpg" rotation="0 90 0" waredrobe1></a-entity>
+      <a-entity id="waredrobe-handle-1" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.89459 5.24249 6.06963"
+      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" waredrobe1></a-entity>
+    <!--Waredrobe 2-->   
+    <a-entity id="waredrobe-2" class="intersectable" static-body="" geometry="depth: 0.57; height: 1.5; width: 0.02" position="1.4411 5.38949 6.08177"
+      material="src: images/dark-texture.jpg" rotation="0 90 0" waredrobe2></a-entity>
+      <a-entity id="waredrobe-handle-2" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.26638 5.24249 6.06963"
+      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" waredrobe2></a-entity>
+    <!--Waredrobe 3-->
+    <a-entity id="waredrobe-3" class="intersectable" static-body="" geometry="depth: 0.68; height: 2; width: 0.02" position="0.80723 5.1383 6.08177"
+      material="src: images/dark-texture.jpg" rotation="0 90 0" waredrobe3></a-entity>
+    <a-entity id="waredrobe-handle-3" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.02716 5.24249 6.06963"
+      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" waredrobe3></a-entity>
+  
     <!--=====================================================================Interactable End=========================================================================================-->
 
     <!--============================================================================JS=============================================================================-->
@@ -1622,18 +1683,14 @@
             isWaterVisible = !isWaterVisible;
 
             if (isWaterVisible) {
-              // Show water by setting the scale
               showerWater.setAttribute('scale', '1 1 1.2');
 
-              // Start audio playback
               showerAudio.play();
             } else {
-              // Hide water by setting the scale to 0
               showerWater.setAttribute('scale', '0 0 0');
 
-              // Stop audio playback
               showerAudio.pause();
-              showerAudio.currentTime = 0; // Reset the audio to the beginning
+              showerAudio.currentTime = 0; 
             }
           });
         },
@@ -1796,7 +1853,7 @@
             property: 'position',
             dur: animationDuration,
             easing: easing,
-            to: isOpenBedroom1 ? '0.3798 4.10988 1.38675' : '0.895 4.090 1.923'
+            to: isOpenBedroom1 ? '0.3798 4.10988 1.38675' : '0.895 4.09 2.03074'
           });
       
           var audioId = isOpenBedroom1 ? 'closeDoorAudio' : 'openDoorAudio';
@@ -1837,7 +1894,7 @@
             property: 'position',
             dur: animationDuration,
             easing: easing,
-            to: isOpenBathroom2 ? '0.935 4.10988 2.72942' : '1.34783 4.10988 3.157'
+            to: isOpenBathroom2 ? '0.935 4.10988 2.72942' : '1.42887 4.10988 3.157'
           });
 
           var audioId = isOpenBathroom2 ? 'closeDoorAudio' : 'openDoorAudio';
@@ -1878,7 +1935,7 @@
             property: 'position',
             dur: animationDuration,
             easing: easing,
-            to: isStoragedoor ? '0.3798 4.10988 8.55605' : '-0.16798 4.10988 9.09437'
+            to: isStoragedoor ? '0.3798 4.10988 8.55605' : '-0.16798 4.10988 9.16804'
           });
 
           var audioId = isStoragedoor ? 'closeDoorAudio' : 'openDoorAudio';
@@ -1919,7 +1976,7 @@
                 property: 'position',
                 dur: animationDuration,
                 easing: easing,
-                to: isBedroomdoor2 ? '-10.56676 4.156 8.81517' : '-10.5426 4.11 8.754'
+                to: isBedroomdoor2 ? '-10.56676 4.156 8.81517' : '-10.53738 4.156 8.78994'
             });
     
             var audioId = isBedroomdoor2 ? 'closeDoorAudio' : 'openDoorAudio';
@@ -2017,9 +2074,432 @@
         }
       });
     
-      //shower2
-      
+      //shower3
+      AFRAME.registerComponent('shower2', {
+        init: function () {
+          var el = this.el;
+          var showerWater = document.getElementById('shower-water-3');
+          var showerAudio = document.getElementById('showerAudio');
+          var isWaterVisible = false;
 
+          el.addEventListener('click', function () {
+            isWaterVisible = !isWaterVisible;
+
+            if (isWaterVisible) {
+              showerWater.setAttribute('scale', '1 1 1.2');
+
+              showerAudio.play();
+            } else {
+              showerWater.setAttribute('scale', '0 0 0');
+
+              showerAudio.pause();
+              showerAudio.currentTime = 0; 
+            }
+          });
+        },
+      });
+      
+      //shower4
+      AFRAME.registerComponent('shower3', {
+        init: function () {
+          var el = this.el;
+          var showerWater = document.getElementById('shower-water-4');
+          var showerAudio = document.getElementById('showerAudio');
+          var isWaterVisible = false;
+
+          el.addEventListener('click', function () {
+            isWaterVisible = !isWaterVisible;
+
+            if (isWaterVisible) {
+              showerWater.setAttribute('scale', '1 1 1.2');
+
+              showerAudio.play();
+            } else {
+              showerWater.setAttribute('scale', '0 0 0');
+
+              showerAudio.pause();
+              showerAudio.currentTime = 0; 
+            }
+          });
+        },
+      });
+      
+      //bathroom Sink 2
+      AFRAME.registerComponent('bathroomsink2', {
+        init: function () {
+          var el = this.el;
+          var waterEntities = document.querySelectorAll('#water2-4, #water2-3');
+          var isWaterVisible = false;
+
+          el.addEventListener('click', function () {
+            isWaterVisible = !isWaterVisible;
+
+            if (isWaterVisible) {
+              // Show water by setting the scale
+              waterEntities.forEach(function (entity) {
+                entity.setAttribute('scale', '1 1 1');
+              });
+
+              // Start audio playback
+              el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
+            } else {
+              // Hide water by setting the scale to 0
+              waterEntities.forEach(function (entity) {
+                entity.setAttribute('scale', '0 0 0');
+              });
+
+              el.removeAttribute('sound');
+            }
+          });
+        },
+      });
+
+      //Tv2
+      document.addEventListener('DOMContentLoaded', function () {
+        const HIDDEN_SCALE = '0 0 0';
+    
+        class VideoController {
+            constructor(videoEntity) {
+                this.videoEntity = videoEntity;
+                this.isVideoPlaying = false;
+            }
+    
+            toggleVideo() {
+                if (this.isVideoPlaying) {
+                    this.pauseAndHideVideo();
+                } else {
+                    this.playVideo();
+                }
+                this.isVideoPlaying = !this.isVideoPlaying;
+            }
+    
+            pauseAndHideVideo() {
+                this.pauseVideo();
+                this.hideVideoBox();
+            }
+    
+            pauseVideo() {
+                this.videoEntity.components.material.material.map.image.pause();
+            }
+    
+            playVideo() {
+                this.videoEntity.components.material.material.map.image.play();
+                this.showVideoBox();
+            }
+    
+            hideVideoBox() {
+                this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
+            }
+    
+            showVideoBox() {
+                this.videoEntity.setAttribute('scale', '1 1 1');
+            }
+        }
+    
+        const tvVideoController2 = new VideoController(
+            document.getElementById('tvVideo2')
+        );
+    
+        document.getElementById('tvScreen2').addEventListener('click', () => tvVideoController2.toggleVideo());
+    });
+
+      //Tv3
+      document.addEventListener('DOMContentLoaded', function () {
+        const HIDDEN_SCALE = '0 0 0';
+    
+        class VideoController {
+            constructor(videoEntity) {
+                this.videoEntity = videoEntity;
+                this.isVideoPlaying = false;
+            }
+    
+            toggleVideo() {
+                if (this.isVideoPlaying) {
+                    this.pauseAndHideVideo();
+                } else {
+                    this.playVideo();
+                }
+                this.isVideoPlaying = !this.isVideoPlaying;
+            }
+    
+            pauseAndHideVideo() {
+                this.pauseVideo();
+                this.hideVideoBox();
+            }
+    
+            pauseVideo() {
+                this.videoEntity.components.material.material.map.image.pause();
+            }
+    
+            playVideo() {
+                this.videoEntity.components.material.material.map.image.play();
+                this.showVideoBox();
+            }
+    
+            hideVideoBox() {
+                this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
+            }
+    
+            showVideoBox() {
+                this.videoEntity.setAttribute('scale', '1 1 1');
+            }
+        }
+    
+        const tvVideoController3 = new VideoController(
+            document.getElementById('tvVideo3')
+        );
+    
+        document.getElementById('tvScreen3').addEventListener('click', () => tvVideoController3.toggleVideo());
+    });    
+      
+      //Bedroom drawer 
+      AFRAME.registerComponent('drawer', {
+        schema: { isOpen: { default: false } },
+        init: function () {
+          this.el.addEventListener('click', this.toggleDrawer.bind(this));
+        },
+        toggleDrawer: function () {
+          var drawerDoor1 = document.getElementById('bedroom-drawerdoor-1');
+          var drawerDoor2 = document.getElementById('bedroom-drawerdoor-2');
+          var handle1 = document.getElementById('bedroom-drawerhandle-1');
+          var handle2 = document.getElementById('bedroom-drawerhandle-2');
+      
+          var isOpen1 = drawerDoor1.getAttribute('drawer').isOpen;
+          var isOpen2 = drawerDoor2.getAttribute('drawer').isOpen;
+      
+          drawerDoor1.setAttribute('drawer', 'isOpen', !isOpen1);
+          drawerDoor2.setAttribute('drawer', 'isOpen', !isOpen2);
+      
+          var animationDuration = 0;
+          var easing = 'easeInOutQuad';
+      
+          drawerDoor1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen1 ? '0 90 0' : '0 0 0'
+          });
+          drawerDoor1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen1 ? '-10.67799 6.16619 14.81062' : '-10.37309 6.16619 14.48496'
+          });
+      
+          handle1.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen1 ? '0 90 0' : '0 0 0'
+          });
+          handle1.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen1 ? '-10.85146 6.0617 14.76944' : '-10.32767 6.0617 14.76944'
+          });
+      
+          drawerDoor2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen2 ? '0 90 0' : '0 180 0'
+          });
+          drawerDoor2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen2 ? '-11.30407 6.16619 14.81062' : '-11.59647 6.16619 14.485'
+          });
+      
+          handle2.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen2 ? '0 90 0' : '0 180 0'
+          });
+          handle2.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpen2 ? '-11.15203 6.0617 14.76944' : '-11.61043 6.14433 14.3187'
+          });
+
+          var audioId = isOpen1 || isOpen2 ? 'drawerOpen' : 'drawerClose';
+          var audio = document.getElementById(audioId);
+
+          if (audio && audio.readyState >= 2) {
+            audio.play();
+          } else {
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
+          }
+        }
+      });
+      
+      //waredrobe 1
+      AFRAME.registerComponent('waredrobe1', {
+        init: function () {
+          this.el.addEventListener('click', this.toggleWardrobe.bind(this));
+        },
+        toggleWardrobe: function () {
+          var wardrobe = document.getElementById('waredrobe-1');
+          var handle = document.getElementById('waredrobe-handle-1');
+          var isOpenW1 = wardrobe.getAttribute('waredrobe1').isOpenW1;
+      
+          wardrobe.setAttribute('waredrobe1', 'isOpenW1', !isOpenW1);
+      
+          var animationDuration = 0;
+          var easing = 'easeInOutQuad';
+      
+          wardrobe.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW1 ? '0 90 0' : '0 0 0'
+          });
+          wardrobe.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW1 ? '2.04402 5.62826 6.08177' : '2.36575 5.62826 5.74016' 
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW1 ? '0 90 0' : '0 0 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW1 ? '1.89459 5.24249 6.06963' : '2.40826 5.24249 6.06963'
+          });
+      
+          var audioId = isOpenW1 ? 'drawerOpen' : 'drawerClose';
+          var audio = document.getElementById(audioId);
+      
+          if (audio && audio.readyState >= 2) {
+            audio.play();
+          } else {
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
+          }
+        }
+      });
+      
+      //waredrobe 2
+      AFRAME.registerComponent('waredrobe2', {
+        init: function () {
+          this.el.addEventListener('click', this.toggleWardrobe.bind(this));
+        },
+        toggleWardrobe: function () {
+          var wardrobe = document.getElementById('waredrobe-2');
+          var handle = document.getElementById('waredrobe-handle-2');
+          var isOpenW2 = wardrobe.getAttribute('waredrobe2').isOpenW2;
+      
+          wardrobe.setAttribute('waredrobe2', 'isOpenW2', !isOpenW2);
+      
+          var animationDuration = 0;
+          var easing = 'easeInOutQuad';
+      
+          wardrobe.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW2 ? '0 90 0' : '0 0 0'
+          });
+          wardrobe.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW2 ? '1.4411 5.38949 6.08177' : '1.71318 5.38949 5.80648'
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW2 ? '0 90 0' : '0 0 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW2 ? '1.26638 5.24249 6.06963' : '1.72692 5.24249 5.62909' 
+          });
+      
+          var audioId = isOpenW2 ? 'drawerOpen' : 'drawerClose';
+          var audio = document.getElementById(audioId);
+      
+          if (audio && audio.readyState >= 2) {
+            audio.play();
+          } else {
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
+          }
+        }
+      });
+      
+      //waredrobe 3
+      AFRAME.registerComponent('waredrobe3', {
+        init: function () {
+          this.el.addEventListener('click', this.toggleWardrobe.bind(this));
+        },
+        toggleWardrobe: function () {
+          var wardrobe = document.getElementById('waredrobe-3');
+          var handle = document.getElementById('waredrobe-handle-3');
+          var isOpenW3 = wardrobe.getAttribute('waredrobe3').isOpenW3;
+      
+          wardrobe.setAttribute('waredrobe3', 'isOpenW3', !isOpenW3);
+      
+          var animationDuration = 0;
+          var easing = 'easeInOutQuad';
+      
+          wardrobe.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW3 ? '0 90 0' : '0 0 0'
+          });
+          wardrobe.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW3 ? '0.80723 5.1383 6.08177' : '0.47328 5.1383 5.71895' 
+          });
+      
+          handle.setAttribute('animation__rotation', {
+            property: 'rotation',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW3 ? '0 90 0' : '0 0 0'
+          });
+          handle.setAttribute('animation__position', {
+            property: 'position',
+            dur: animationDuration,
+            easing: easing,
+            to: isOpenW3 ? '1.02716 5.24249 6.06963' : '0.45464 5.24249 5.56757'
+          });
+      
+          var audioId = isOpenW3 ? 'drawerOpen' : 'drawerClose';
+          var audio = document.getElementById(audioId);
+      
+          if (audio && audio.readyState >= 2) {
+            audio.play();
+          } else {
+            audio.addEventListener('loadeddata', function () {
+              audio.play();
+            });
+          }
+        }
+      });
+      
     </script>
     <!---===========================================================================JS end=========================================================================-->
 
@@ -2715,13 +3195,10 @@
       material="src: images/metal.jpg" scale="" rotation="0 90 0"></a-entity>
     <a-entity static-body="" geometry="depth: 0.8; height: 0.6; width: 0.04" position="2.72721 5.779 2.55068"
       material="src: images/black.jpg" scale="" rotation="0 90 0"></a-entity>
-    <a-entity static-body="" geometry="depth: 2; height: 1.2; width: 0.02" position="2.71119 5.779 2.52708"
-      material="src: images/tv.png" scale="" rotation="0 90 0"></a-entity>
 
     <!--Bathroom2-->
     <a-entity static-body="" geometry="height: 3.4; width: 0.04; depth: 3" position="2.4183 5.82768 5.54035"
       material="src: images/white.jpg"></a-entity>
-    <a-entity gltf-model="#toilet" position="3.6774 4.13491 3.18287" scale="0.015 0.015 0.015" rotation=""></a-entity>
 
     <!--mirror-->
     <a-entity geometry="width: 0.02; depth: 0.7"
@@ -2796,20 +3273,6 @@
     <a-entity static-body="" geometry="depth: 1.3; width: 0.02" position="1.08842 6.61244 6.56203"
       material="src: images/white.jpg" rotation="0 90 90"></a-entity>
 
-    <!--Waredrobe's door and handles-->
-    <a-entity static-body="" geometry="depth: 0.64; height: 2.98; width: 0.02" position="2.04402 5.62826 6.08177"
-      material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.57; height: 1.5; width: 0.02" position="1.4411 5.38949 6.08177"
-      material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.68; height: 2; width: 0.02" position="0.80723 5.1383 6.08177"
-      material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.89459 5.24249 6.06963"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.26638 5.24249 6.06963"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.02716 5.24249 6.06963"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-
     <!--Rug-->
     <a-entity static-body="" geometry="height: 4.140; width: 0.01; depth: 4.6" position="2.380 4.13922 0.40447"
       material="src: images/dining-rug.jpg; repeat: 6 6" scale="" rotation="0 0 90"></a-entity>
@@ -2826,6 +3289,8 @@
 
     <a-entity static-body="" geometry="depth: 3.3; height: 3.5; width: 0.15" position="-14.562 5.779 10.76118"
       material="src: images/stone-wall.jpg"></a-entity>
+    
+    <a-entity static-body="" geometry="depth: 1.25; height: 3.5; width: 0.15" position="-9.93923 5.779 8.8339" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
 
     <!--Arts-->
     <a-entity static-body="" geometry="height: 2.2; width: 0.02; depth: 0.9" position="-14.48167 6.24208 11.66997"
@@ -2858,10 +3323,6 @@
     <a-entity static-body="" geometry="depth: 1.25; width: 0.02" position="-10.98902 4.50231 15.30381"
       material="src: images/white.jpg" rotation="0 90 90"></a-entity>
 
-    <a-entity static-body="" geometry="depth: 0.63; height: 1.93; width: 0.02" position="-10.67799 6.16619 14.81062"
-      material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.62; height: 1.93; width: 0.02" position="-11.30407 6.16619 14.81062"
-      material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
     <a-entity static-body="" geometry="depth: 0.63; height: 0.32; width: 0.02" position="-10.67774 5.02092 14.81062"
       material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
     <a-entity static-body="" geometry="depth: 0.6; height: 0.32; width: 0.02" position="-11.31014 5.02092 14.81062"
@@ -2875,12 +3336,8 @@
     <a-entity static-body="" geometry="depth: 0.6; height: 0.33; width: 0.02" position="-11.31014 4.32776 14.81062"
       material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
 
-    <a-entity static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="-10.85146 6.0617 14.76944"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.6; height: 0.33; width: 0.02" position="-11.31014 4.32776 14.81062"
+      <a-entity static-body="" geometry="depth: 0.6; height: 0.33; width: 0.02" position="-11.31014 4.32776 14.81062"
       material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="-11.15203 6.0617 14.76944"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.03; height: 0.2; width: 0.02" position="-10.68011 5.08622 14.76944"
       material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.03; height: 0.2; width: 0.02" position="-11.30098 5.08622 14.76944"
@@ -2922,8 +3379,6 @@
       material="src: images/metal.jpg" scale="" rotation=""></a-entity>
     <a-entity static-body="" geometry="depth: 0.8; height: 0.6; width: 0.04" position="-10.48048 6.68579 11.48079"
       material="src: images/black.jpg" scale="" rotation=""></a-entity>
-    <a-entity static-body="" geometry="depth: 2; height: 1.2; width: 0.02" position="-10.51476 6.59185 11.53336"
-      material="src: images/tv.png" scale="" rotation=""></a-entity>
     <!--rug-->
     <a-entity static-body="" geometry="height: 4.4; width: 0.01; depth: 7" position="-12.42707 4.13922 12.261"
       material="src: images/dining-rug.jpg; repeat: 6 6" scale="" rotation="0 0 90"></a-entity>
@@ -3107,11 +3562,7 @@
       material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
     <a-entity static-body="" geometry="depth: 3.5; height: 3.5; width: 0.15" position="-6.87914 5.779 10.52103"
       material="src: images/stone-wall.jpg" scale="" rotation=""></a-entity>
-    <a-entity static-body="" geometry="depth: 1.2; height: 3.5; width: 0.15" position="-7.40421 5.779 8.8339"
-      material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
     <a-entity static-body="" geometry="depth: 2.4; height: 3.5; width: 0.15" position="-6.81809 5.779 8.8339"
-      material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
-    <a-entity static-body="" geometry="depth: 1.25; height: 3.5; width: 0.15" position="-9.94361 5.779 8.8339"
       material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
 
     <a-entity static-body="" geometry="depth: 1.65; height: 3.3; width: 0.02" position="-7.95892 5.75391 12.13726"
@@ -3168,21 +3619,6 @@
     <a-entity static-body="" geometry="depth: 0.35; height: 0.35; width: 0.005" position="-7.49457 6.9462 11.37287"
       material="src: images/shower.jpg" rotation="0 0 90" scale="1 1 1.2"></a-entity>
 
-    <!--heat modify-->
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.06"
-      position="-7.04681 5.9701 10.88364" material="src: images/metal-solid.jpg" rotation="90 0 90"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="-7.00462 6.03595 10.88698"
-      material="src: images/steel.jpg" rotation="" scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-7.04681 6.11457 10.78262" material="src: images/metal-solid.jpg" rotation="90 0 90"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-7.04681 6.11457 10.88364" material="src: images/metal-solid.jpg" rotation="90 0 90"
-      scale="1 1 1.2"></a-entity>
-    <a-entity static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-7.04681 6.11457 10.98175" material="src: images/metal-solid.jpg" rotation="90 0 90"
-      scale="1 1 1.2"></a-entity>
     <!--Rug-->
     <a-entity static-body="" geometry="height: 2; width: 0.01; depth: 1.6" position="-7.94768 4.14016 9.57199"
       material="src: images/dining-rug.jpg; repeat: 6 6" scale="" rotation="0 0 90"></a-entity>
@@ -3194,12 +3630,6 @@
       position="-10.02309 6.40748 9.40963" rotation="90 0 90"></a-entity>
     <a-entity geometry="width: 0.02; height: 0.35; depth: 0.9" material="src: images/black.jpg"
       position="-10.02181 5.81097 9.84969" rotation="0 0 90"></a-entity>
-
-    <!--Toilet-->
-    <a-entity gltf-model="assets/toilet_vaa-772662wh.glb" position="-7.27823 4.14115 9.54463" scale="0.015 0.015 0.015"
-      rotation="0 270 0"></a-entity>
-    <!--Sink-->
-    <a-entity gltf-model="#b-sink" position="-9.83049 5.19579 9.81031" scale="0.012 0.015 0.015" rotation=""></a-entity>
 
     <!--stair-->
     <a-entity static-body="" geometry="depth: 1.5; height: 3.5; width: 0.04" position="-5.24208 2.29 4.015"
@@ -3227,23 +3657,23 @@
       material="src: images/art8.jpg" scale="" rotation="0 90 0"></a-entity>
     <!---Staircases-->
     <a-entity static-body="" geometry="depth: 1.02; height: 0.5; width: 0.31" position="-4.59875 0.73724 4.99527"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 1.02; height: 1.5; width: 0.3" position="-4.60396 1.04083 4.12511"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-3.82192 1.39396 4.11172"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-3.45752 1.80964 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-3.10447 2.229 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-2.74308 2.62707 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-2.37939 3.0393 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.3; height: 1.5; width: 0.42" position="-2.02284 3.45494 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
     <a-entity static-body="" geometry="depth: 0.45; height: 1.5; width: 0.42" position="-1.58603 3.86743 4.112"
-      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="collidable"></a-entity>
+      material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2"></a-entity>
 
     <!--Store room-->
     <a-entity static-body="" geometry="depth: 1.5; height: 3.5; width: 0.15" position="0.95178 2.32723 -1.20814"
