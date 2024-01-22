@@ -6,13 +6,19 @@
   <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
   <script
     src="https://rawgit.com/fernandojsg/aframe-teleport-controls/master/dist/aframe-teleport-controls.min.js"></script>
-
+  <script
+    src="https://cdn.rawgit.com/IdeaSpaceVR/aframe-particle-system/v2.3.0/dist/aframe-particle-system.min.js"></script>
   <title>My WebVR House</title>
 </head>
 
 <body>
-  <a-scene
-    environment="preset: forest; dressing: trees; ground: flat; groundColor: #656c65; groundTexture: none; horizonColor: #96a98a; skyColor: #b0d8ff; lightPosition: 1 50 -2; fog: 0.5w; fogColor: #b0d8ff; shadow: true; dressingColor: #004d00">
+ <!-- Loading screen -->
+ <div id="loadingScreen">
+  <p>Loading...</p>
+</div>
+
+  <a-scene id="aframeScene" visible="false"
+    environment="preset: starry; ground: flat; groundColor: #656c65; groundTexture: none; horizonColor: #96a98a; skyColor: #b0d8ff; lightPosition: 1 50 -2; fog: 0.5w; fogColor: #b0d8ff; shadow: true; dressingColor: #004d00">
     <!-- Your scene elements go here -->
     <a-assets>
       <!--======================================== Model Assets =========================================================-->
@@ -52,6 +58,11 @@
       <a-asset-item id="shelf" src="assets/shelf.glb"></a-asset-item>
       <a-asset-item id="coffeemaker" src="assets/coffee_maker.glb"></a-asset-item>
 
+      <a-asset-item id="ceillinglamp" src="assets/ceiling_lamp.glb"></a-asset-item>
+
+      <a-asset-item id="fence" src="assets/fence_vinyl_-_two_post_ends.glb"></a-asset-item>
+
+
       <!--Images-->
       <a-asset-item id="tv" src="images/tv.png"></a-asset-item>
       <img id="fire" src="images/fire.png">
@@ -75,6 +86,7 @@
       <audio id="showerAudio" src="assets/audio/shower.mp3" loop sound></audio>
       <audio id="gasAudio" src="assets/audio/gas.mp3" sound></audio>
       <audio id="teleport" src="assets/audio/teleport.mp3"></audio>
+      <audio id="light_switch" src="assets/audio/switch_click.mp3"></audio>
 
 
       <!--Video-->
@@ -84,43 +96,2028 @@
       <video id="tv-video3" src="videos/tv-video3.mp4" loop></video>
     </a-assets>
 
-    <a-light type="directional" position="1 50 -2" target="#ground" castShadow="true"></a-light>
-
-    <a-entity camera="" id="cameraRig" position="-7.895 2.2 -18.43716" rotation="0 90 0"
-      wasd-controls="acceleration: 30" look-controls="pointerLockEnabled: true; touchEnabled: false">
-
-      <a-entity cursor="fuse: true; fuseTimeout: 0; rayOrigin: mouse" raycaster="far: 4; objects: .intersectable" position="0.1 0 0"></a-entity>
-        <a-entity position="0 0 -0.75">
-          <!-- Horizontal line of the cross -->
-          <a-plane width="0.05" height="0.005" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
-            geometry=""></a-plane>
-          <!-- Vertical line of the cross -->
-          <a-plane width="0.005" height="0.05" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
-            geometry=""></a-plane>
+    <a-entity rotation="0 180 0">
+      <a-entity id="cameraRig" position="5.256 2.2 11.301" camera wasd-controls="acceleration: 15"
+        look-controls="pointerLockEnabled: true; touchEnabled: false">
+        <!-- Enhanced Cursor -->
+        <a-entity id="cursor" cursor="fuse: false; rayOrigin: 0.1 0 0" raycaster="far: 1.5; objects: .intersectable" position="0 0 0">
+          <a-entity position="0 0 -0.5">
+            <a-plane width="0.05" height="0.005" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
+              geometry=""></a-plane>
+            <a-plane width="0.005" height="0.05" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
+              geometry=""></a-plane>
+          </a-entity>
         </a-entity>
+      </a-entity>
     </a-entity>
-
-
     <!--=========================================================================================-->
+     <!--=====================================================================Interactable End=========================================================================================-->
+
+  <!--============================================================================JS=============================================================================-->
+
+  <script>
+
+    //lights
+    AFRAME.registerComponent('switch-light', {
+      init: function () {
+        this.el.sceneEl.addEventListener('loaded', this.onSceneLoaded.bind(this));
+      },
+
+      onSceneLoaded: function () {
+        this.el.lightsOn = false;
+        this.updateLights(false);
+        this.el.addEventListener('click', this.switchLight.bind(this));
+      },
+
+      switchLight: function () {
+        var lightsOn = !this.el.lightsOn;
+        this.updateLights(lightsOn);
+
+        if (lightsOn) {
+          this.playClickSound();
+        }
+      },
+
+      updateLights: function (lightsOn) {
+        var light1 = document.getElementById('pointLight1');
+        var ambientLight = document.getElementById('ambientLight');
+        var light2 = document.getElementById('pointLight2');
+        var light3 = document.getElementById('pointLight3');
+        var light4 = document.getElementById('pointLight4');
+        var light5 = document.getElementById('pointLight5');
+        var light6 = document.getElementById('pointLight6');
+        var light7 = document.getElementById('pointLight7');
+        var light8 = document.getElementById('pointLight8');
+
+        this.setLightAttributes(light1, lightsOn);
+        this.setLightAttributes(ambientLight, lightsOn);
+        this.setLightAttributes(light2, lightsOn);
+        this.setLightAttributes(light3, lightsOn);
+        this.setLightAttributes(light4, lightsOn);
+        this.setLightAttributes(light5, lightsOn);
+        this.setLightAttributes(light6, lightsOn);
+        this.setLightAttributes(light7, lightsOn);
+        this.setLightAttributes(light8, lightsOn);
+
+        var switchText = document.getElementById('SwitchText');
+        switchText.setAttribute('text', 'value', lightsOn ? 'Light switch (ON)' : 'Light switch (OFF)');
+        this.el.lightsOn = lightsOn;
+      },
+
+      setLightAttributes: function (light, lightsOn) {
+        if (lightsOn) {
+          light.setAttribute('color', '#DDD');
+          light.setAttribute('groundColor', '#DDD');
+        } else {
+          light.setAttribute('color', '#222');
+          light.setAttribute('groundColor', '#222');
+        }
+      },
+
+      playClickSound: function () {
+        var clickSound = document.querySelector('#light_switch');
+        clickSound.play();
+      }
+    });
+
+    //Entrance door
+    AFRAME.registerComponent('door', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoors.bind(this));
+        // Set the initial rotation for door1 based on the isOpen attribute
+        if (this.el.id === 'double-door-1') {
+          this.updateRotation();
+        }
+      },
+      toggleDoors: function () {
+        var door1 = document.getElementById('double-door-1');
+        var door2 = document.getElementById('double-door-2');
+
+        var isOpen1 = door1.getAttribute('door').isOpen;
+        var isOpen2 = door2.getAttribute('door').isOpen;
+
+        door1.setAttribute('door', 'isOpen', !isOpen1);
+        door2.setAttribute('door', 'isOpen', !isOpen2);
+
+        var animationDuration = 400;
+        var easing = 'easeInOutQuad';
+
+        door1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen1 ? '-8.49563 0.52224 3.96794' : '-9.17592 0.52224 3.31'
+        });
+        door1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen1 ? '0 0 0' : '0 -90 0'
+        });
+
+        door2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen2 ? '-11.452 0.519 3.968' : '-10.687 0.51933 3.31'
+        });
+        door2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen2 ? '0 0 0' : '0 90 0'
+        });
+
+        var audioId = isOpen1 || isOpen2 ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      },
+      updateRotation: function () {
+        // Set the initial rotation for door1 based on the isOpen attribute
+        var isOpen = this.el.getAttribute('door').isOpen;
+        var initialRotation = isOpen ? '0 -90 0' : '0 0 0';
+        this.el.setAttribute('rotation', initialRotation);
+      }
+    });
+
+    //back Doors
+    AFRAME.registerComponent('backdoor', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoors.bind(this));
+        // Set the initial rotation for backDoor2 based on the isOpen attribute
+        if (this.el.id === 'back-double-door-2') {
+          this.updateRotation();
+        }
+      },
+      toggleDoors: function () {
+        var backDoor1 = document.getElementById('back-double-door-1');
+        var backDoor2 = document.getElementById('back-double-door-2');
+
+        var isOpenBack1 = backDoor1.getAttribute('backdoor').isOpen;
+        var isOpenBack2 = backDoor2.getAttribute('backdoor').isOpen;
+
+        backDoor1.setAttribute('backdoor', 'isOpen', !isOpenBack1);
+        backDoor2.setAttribute('backdoor', 'isOpen', !isOpenBack2);
+
+        var animationDuration = 400;
+        var easing = 'easeInOutQuad';
+
+        backDoor1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenBack1 ? '-0.87091 0.555 10.70427' : '-0.11894 0.55543 10.013'
+        });
+        backDoor1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenBack1 ? '0 0 0' : '0 90 0'
+        });
+
+        backDoor2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenBack2 ? '2.13587 0.55543 10.71952' : '1.45762 0.55543 10.013'
+        });
+        backDoor2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenBack2 ? '0 0 0' : '0 -90 0'
+        });
+
+        var audioId = isOpenBack1 || isOpenBack2 ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      },
+      updateRotation: function () {
+        // Set the initial rotation for backDoor2 based on the isOpen attribute
+        var isOpen = this.el.getAttribute('backdoor').isOpen;
+        var initialRotation = isOpen ? '0 -90 0' : '0 0 0';
+        this.el.setAttribute('rotation', initialRotation);
+      }
+    });
+
+    //Bathroom door
+    AFRAME.registerComponent('bathroomdoor', {
+      schema: { isOpenB: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var bathroomDoor = document.getElementById('bathroom-door-1');
+        var isOpenB = bathroomDoor.getAttribute('bathroomdoor').isOpenB;
+
+        bathroomDoor.setAttribute('bathroomdoor', 'isOpenB', !isOpenB);
+
+        var animationDuration = 600;
+        var easing = 'easeInOutQuad';
+
+        bathroomDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenB ? '0 180 0' : '0 270 0'
+        });
+        bathroomDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenB ? '-1.48867 0.54 8.63875' : '-1.01557 0.54 8.07976'
+        });
+
+        var audioId = isOpenB ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //pool door
+    AFRAME.registerComponent('pooldoor', {
+      schema: { isOpenP: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var poolDoor = document.getElementById('pool-door');
+        var isOpenP = poolDoor.getAttribute('pooldoor').isOpenP;
+
+        poolDoor.setAttribute('pooldoor', 'isOpenP', !isOpenP);
+
+        var animationDuration = 600;
+        var easing = 'easeInOutQuad';
+
+        poolDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenP ? '0 180 0' : '0 90 0'
+        });
+        poolDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenP ? '-9.62711 1.83002 8.82728' : '-9.627 1.83002 8.67283'
+        });
+
+        var audioId = isOpenP ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //refrigerator
+    AFRAME.registerComponent('fridgedoor', {
+      schema: { isOpenF: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoors.bind(this));
+      },
+      toggleDoors: function () {
+        var fridgeDoor1 = document.getElementById('fridge-door-1');
+        var fridgeDoor2 = document.getElementById('fridge-door-2');
+        var handle1 = document.getElementById('handle1');
+        var handle2 = document.getElementById('handle2');
+
+        var isOpenF1 = fridgeDoor1.getAttribute('fridgedoor').isOpenF;
+        var isOpenF2 = fridgeDoor2.getAttribute('fridgedoor').isOpenF;
+
+        fridgeDoor1.setAttribute('fridgedoor', 'isOpenF', !isOpenF1);
+        fridgeDoor2.setAttribute('fridgedoor', 'isOpenF', !isOpenF2);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        fridgeDoor1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenF1 ? '0 0 0' : '0 -100 0'
+        });
+        fridgeDoor1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenF1 ? '-0.22207 1.86745 2.12807' : '0.10934 1.86745 2.49779'
+        });
+
+        handle1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenF1 ? '0 0 0' : '0 -100 0'
+        });
+        handle1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenF1 ? '-0.09834 2.0126 1.90948' : '0.33928 2.0126 2.56258'
+        });
+
+        fridgeDoor2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenF2 ? '0 0 0' : '0 100 0'
+        });
+        fridgeDoor2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenF2 ? '-0.22207 1.86714 1.3806' : '0.096 1.86714 0.97803'
+        });
+
+        handle2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenF2 ? '0 0 0' : '0 100 0'
+        });
+        handle2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenF2 ? '-0.09834 2.0126 1.60382' : '0.3463 2.0126 0.90191'
+        });
+
+        var audioId = isOpenF1 || isOpenF2 ? 'openFridge' : 'closeFridge';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () { audio.play(); });
+        }
+
+        var fridgeRunningSound = document.getElementById('Fridge');
+
+        if (isOpenF1 || isOpenF2) {
+          fridgeRunningSound.pause();
+          fridgeRunningSound.loop = true;
+        } else {
+          fridgeRunningSound.play();
+          fridgeRunningSound.currentTime = 0;
+          fridgeRunningSound.loop = false;
+        }
+      }
+    });
+
+    //Storage doors
+    AFRAME.registerComponent('storagedoor', {
+      schema: { isOpenS: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoors.bind(this));
+      },
+      toggleDoors: function () {
+        var storageDoor1 = document.getElementById('storage-door-1');
+        var storageDoor2 = document.getElementById('storage-door-2');
+        var handle1 = document.getElementById('handle-storage-1');
+        var handle2 = document.getElementById('handle-storage-2');
+
+        var isOpenS1 = storageDoor1.getAttribute('storagedoor').isOpenS;
+        var isOpenS2 = storageDoor2.getAttribute('storagedoor').isOpenS;
+
+        storageDoor1.setAttribute('storagedoor', 'isOpenS', !isOpenS1);
+        storageDoor2.setAttribute('storagedoor', 'isOpenS', !isOpenS2);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        storageDoor1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenS1 ? '0 90 0' : '0 0 0'
+        });
+        storageDoor1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenS1 ? '-0.7869 2.32204 -0.47444' : '-1.30988 2.32204 0.06979'
+        });
+
+        handle1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenS1 ? '0 90 0' : '0 0 0'
+        });
+        handle1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenS1 ? '-0.43765 2.32204 -0.44493' : '-1.33575 2.32204 0.5045'
+        });
+
+        storageDoor2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenS2 ? '0 90 0' : '0 0 0'
+        });
+        storageDoor2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenS2 ? '0.41011 2.32204 -0.47444' : '1.00315 2.32204 0.12903'
+        });
+
+        handle2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenS2 ? '0 90 0' : '0 0 0'
+        });
+        handle2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenS2 ? '0.02765 2.32204 -0.44493' : '1.04491 2.322 0.52845'
+        });
+
+        var audioId = isOpenS1 || isOpenS2 ? 'storageOpen' : 'storageClose';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    // Small Storage doors
+    AFRAME.registerComponent('smallstoragedoor', {
+      schema: { isOpenSS: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoors.bind(this));
+      },
+      toggleDoors: function () {
+        var smallStorageDoor1 = document.getElementById('small-storage-door-1');
+        var smallStorageDoor2 = document.getElementById('small-storage-door-2');
+        var handle1 = document.getElementById('handle-small-storage-1');
+        var handle2 = document.getElementById('handle-small-storage-2');
+
+        var isOpenSS1 = smallStorageDoor1.getAttribute('smallstoragedoor').isOpenSS;
+        var isOpenSS2 = smallStorageDoor2.getAttribute('smallstoragedoor').isOpenSS;
+
+        smallStorageDoor1.setAttribute('smallstoragedoor', 'isOpenSS', !isOpenSS1);
+        smallStorageDoor2.setAttribute('smallstoragedoor', 'isOpenSS', !isOpenSS2);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        smallStorageDoor1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenSS1 ? '0 90 0' : '0 0 0'
+        });
+        smallStorageDoor1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenSS1 ? '-0.49617 3.43639 -1.36877' : '-0.76035 3.43263 -1.1184'
+        });
+
+        handle1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenSS1 ? '0 0 0' : '0 90 0'
+        });
+        handle1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenSS1 ? '-0.08669 3.50788 -1.29269' : '-0.77454 3.50788 -0.91007'
+        });
+
+        smallStorageDoor2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenSS2 ? '0 90 0' : '0 0 0'
+        });
+        smallStorageDoor2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenSS2 ? '0.03015 3.43639 -1.36877' : '0.28416 3.43639 -1.10795'
+        });
+
+        handle2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenSS2 ? '0 0 0' : '0 90 0'
+        });
+        handle2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenSS2 ? '-0.38846 3.50788 -1.29269' : '0.29548 3.50788 -0.96703'
+        });
+
+        var audioId = isOpenSS1 || isOpenSS2 ? 'drawerOpen' : 'drawerClose';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //Box 1
+    AFRAME.registerComponent('boxesdoor', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var boxesDoor = document.getElementById('boxes-door-1');
+        var handle = document.getElementById('handle-boxes-1');
+        var isOpenb1 = boxesDoor.getAttribute('boxesdoor').isOpenb1;
+
+        boxesDoor.setAttribute('boxesdoor', 'isOpenb1', !isOpenb1);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        boxesDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb1 ? '0 90 0' : '0 170 0'
+        });
+        boxesDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb1 ? '1.9548 1.10462 -0.91695' : '1.596 1.10462 -0.608'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb1 ? '90 90 0' : '90 170 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb1 ? '2.01904 1.43714 -0.88374' : '1.568 1.43714 -0.549'
+        });
+
+        if (!boxesDoor.hasAttribute('raycaster')) {
+          boxesDoor.setAttribute('raycaster', 'objects: .collidable');
+        }
+
+        var audioId = isOpenb1 ? 'drawerClose' : 'drawerOpen';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    // Box 2
+    AFRAME.registerComponent('boxesdoor2', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var boxesDoor = document.getElementById('boxes-door-2');
+        var handle = document.getElementById('handle-boxes-2');
+        var isOpenb2 = boxesDoor.getAttribute('boxesdoor2').isOpenb2;
+
+        boxesDoor.setAttribute('boxesdoor2', 'isOpenb2', !isOpenb2);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        boxesDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb2 ? '0 90 0' : '0 170 0'
+        });
+        boxesDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb2 ? '1.9548 2.24583 -0.90258' : '1.59602 2.246 -0.60841'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb2 ? '90 90 0' : '90 170 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb2 ? '2.01904 1.62829 -0.88374' : '1.56824 1.62829 -0.54871'
+        });
+
+        var audioId = isOpenb2 ? 'drawerClose' : 'drawerOpen';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    // Box 3
+    AFRAME.registerComponent('boxesdoor3', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var boxesDoor = document.getElementById('boxes-door-3');
+        var handle = document.getElementById('handle-boxes-3');
+        var isOpenb3 = boxesDoor.getAttribute('boxesdoor3').isOpenb3;
+
+        // Toggle the door state
+        boxesDoor.setAttribute('boxesdoor3', 'isOpenb3', !isOpenb3);
+
+        // Define animation properties
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        // Update door properties based on the state with animation
+        boxesDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb3 ? '0 90 0' : '0 170 0'
+        });
+        boxesDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb3 ? '1.9548 3.26608 -0.9025' : '1.596 3.26608 -0.608'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb3 ? '90 90 0' : '90 170 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb3 ? '2.01904 3.04595 -0.88374' : '1.568 3.04595 -0.549'
+        });
+
+        // Play the sound effect based on the state
+        var audioId = isOpenb3 ? 'drawerClose' : 'drawerOpen';
+        var audio = document.getElementById(audioId);
+
+        // Check if the audio element is defined and is loaded
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          // If the audio is not loaded, wait for the 'loadeddata' event
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    // Box 4
+    AFRAME.registerComponent('boxesdoor4', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var boxesDoor = document.getElementById('boxes-door-4');
+        var handle = document.getElementById('handle-boxes-4');
+        var isOpenb4 = boxesDoor.getAttribute('boxesdoor4').isOpenb4;
+
+        // Toggle the door state
+        boxesDoor.setAttribute('boxesdoor4', 'isOpenb4', !isOpenb4);
+
+        // Define animation properties
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        // Update door properties based on the state with animation
+        boxesDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb4 ? '0 90 0' : '0 170 0'
+        });
+        boxesDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb4 ? '2.62905 2.96795 -0.917' : '2.22453 2.96795 -0.57238'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb4 ? '0 90 0' : '0 -10 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb4 ? '2.86394 2.64347 -0.88374' : '2.17656 2.64347 -0.38159'
+        });
+
+        // Play the sound effect based on the state
+        var audioId = isOpenb4 ? 'drawerClose' : 'drawerOpen';
+        var audio = document.getElementById(audioId);
+
+        // Check if the audio element is defined and is loaded
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          // If the audio is not loaded, wait for the 'loadeddata' event
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    // Box 5
+    AFRAME.registerComponent('boxesdoor5', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var boxesDoor = document.getElementById('boxes-door-5');
+        var handle = document.getElementById('handle-boxes-5');
+        var isOpenb5 = boxesDoor.getAttribute('boxesdoor5').isOpenb5;
+
+        // Toggle the door state
+        boxesDoor.setAttribute('boxesdoor5', 'isOpenb5', !isOpenb5);
+
+        // Define animation properties
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        // Update door properties based on the state with animation
+        boxesDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb5 ? '0 90 0' : '0 10 0'
+        });
+        boxesDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb5 ? '3.33715 2.79565 -0.917' : '3.71341 2.79565 -0.60342'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb5 ? '0 90 0' : '0 10 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb5 ? '3.0935 2.64347 -0.88374' : '3.75165 2.64347 -0.42411'
+        });
+
+        // Check if raycasting components are present and update the collidable class
+        if (!boxesDoor.hasAttribute('raycaster')) {
+          boxesDoor.setAttribute('raycaster', 'objects: .collidable');
+        }
+
+        // Play the sound effect based on the state
+        var audioId = isOpenb5 ? 'drawerClose' : 'drawerOpen';
+        var audio = document.getElementById(audioId);
+
+        // Check if the audio element is defined and is loaded
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          // If the audio is not loaded, wait for the 'loadeddata' event
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    // Box 6
+    AFRAME.registerComponent('boxesdoor6', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var boxesDoor = document.getElementById('boxes-door-6');
+        var handle = document.getElementById('handle-boxes-6');
+        var isOpenb6 = boxesDoor.getAttribute('boxesdoor6').isOpenb6;
+
+        // Toggle the door state
+        boxesDoor.setAttribute('boxesdoor6', 'isOpenb6', !isOpenb6);
+
+        // Define animation properties
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        // Update door properties based on the state with animation
+        boxesDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb6 ? '0 90 0' : '0 0 0'
+        });
+        boxesDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb6 ? '4.0313 2.79565 -0.917' : '4.38493 2.79565 -0.58662'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb6 ? '0 90 0' : '0 90 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb6 ? '3.79911 2.64347 -0.88374' : '4.40576 2.64347 -0.88374'
+        });
+
+        // Check if raycasting components are present and update the collidable class
+        if (!boxesDoor.hasAttribute('raycaster')) {
+          boxesDoor.setAttribute('raycaster', 'objects: .collidable');
+        }
+
+        // Play the sound effect based on the state
+        var audioId = isOpenb6 ? 'drawerClose' : 'drawerOpen';
+        var audio = document.getElementById(audioId);
+
+        // Check if the audio element is defined and is loaded
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          // If the audio is not loaded, wait for the 'loadeddata' event
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    // Box 7
+    AFRAME.registerComponent('boxesdoor7', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var boxesDoor = document.getElementById('boxes-door-7');
+        var handle = document.getElementById('handle-boxes-7');
+        var isOpenb7 = boxesDoor.getAttribute('boxesdoor7').isOpenb7;
+
+        // Toggle the door state
+        boxesDoor.setAttribute('boxesdoor7', 'isOpenb7', !isOpenb7);
+
+        // Define animation properties
+        var animationDuration = 500;
+        var easing = 'easeInOutQuad';
+
+        // Update door properties based on the state with animation
+        boxesDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb7 ? '0 0 0' : '0 0 0'
+        });
+        boxesDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb7 ? '3.69441 1.0734 -0.36638' : '3.694 1.073 -1.25966'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb7 ? '0 0 0' : '0 0 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb7 ? '3.67654 1.08804 -0.00156' : '3.67654 1.08804 -0.86773'
+        });
+
+        var audioId = isOpenb7 ? 'drawerClose' : 'drawerOpen';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    // Box 8
+    AFRAME.registerComponent('boxesdoor8', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var boxesDoor = document.getElementById('boxes-door-8');
+        var handle = document.getElementById('handle-boxes-8');
+        var isOpenb8 = boxesDoor.getAttribute('boxesdoor8').isOpenb8;
+
+        // Toggle the door state
+        boxesDoor.setAttribute('boxesdoor8', 'isOpenb8', !isOpenb8);
+
+        // Define animation properties
+        var animationDuration = 500;
+        var easing = 'easeInOutQuad';
+
+        // Update door properties based on the state with animation
+        boxesDoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb8 ? '0 0 0' : '0 100 0'
+        });
+        boxesDoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb8 ? '3.69441 1.0734 1.81199' : '3.4434 1.073 2.12672'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb8 ? '0 0 0' : '0 100 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenb8 ? '3.67654 1.08804 1.63343' : '3.30317 1.08804 2.15208'
+        });
+
+        // Check if raycasting components are present and update the collidable class
+        if (!boxesDoor.hasAttribute('raycaster')) {
+          boxesDoor.setAttribute('raycaster', 'objects: .collidable');
+        }
+
+        // Play the sound effect based on the state
+        var audioId = isOpenb8 ? 'drawerClose' : 'drawerOpen';
+        var audio = document.getElementById(audioId);
+
+        // Check if the audio element is defined and is loaded
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          // If the audio is not loaded, wait for the 'loadeddata' event
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //Tv and Ps5
+    document.addEventListener('DOMContentLoaded', function () {
+      const HIDDEN_SCALE = '0 0 0';
+
+      class VideoController {
+        constructor(videoEntity, speakerEntity1, speakerEntity2, otherController) {
+          this.videoEntity = videoEntity;
+          this.speakerEntity1 = speakerEntity1;
+          this.speakerEntity2 = speakerEntity2;
+          this.isVideoPlaying = false;
+          this.otherController = otherController;
+        }
+
+        toggleVideo() {
+          if (this.isVideoPlaying) {
+            this.pauseAndHideVideo();
+          } else {
+            // Pause the other video before playing this one
+            if (this.otherController.isVideoPlaying) {
+              this.otherController.pauseAndHideVideo();
+            }
+            this.playVideo();
+          }
+          this.isVideoPlaying = !this.isVideoPlaying;
+        }
+
+        pauseAndHideVideo() {
+          this.pauseVideo();
+          this.hideVideoBox();
+          this.resetSpeakerAnimation();
+        }
+
+        pauseVideo() {
+          this.videoEntity.components.material.material.map.image.pause();
+          this.resetSpeakerAnimation();
+        }
+
+        playVideo() {
+          this.videoEntity.components.material.material.map.image.play();
+          this.startSpeakerAnimations();
+          this.showVideoBox();
+        }
+
+        hideVideoBox() {
+          this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
+        }
+
+        showVideoBox() {
+          this.videoEntity.setAttribute('scale', '1 1 1');
+        }
+
+        resetSpeakerAnimation() {
+          this.speakerEntity1.removeAttribute('animation__scale');
+          this.speakerEntity2.removeAttribute('animation__scale');
+        }
+
+        startSpeakerAnimations() {
+          this.speakerEntity1.setAttribute('animation__scale', "property: scale; to: 1.2 1.2 1.2; easing: easeInOutQuad; dur: 500; loop: true");
+          this.speakerEntity2.setAttribute('animation__scale', "property: scale; to: 1.2 1.2 1.2; easing: easeInOutQuad; dur: 500; loop: true");
+        }
+      }
+
+      const tvVideoController = new VideoController(
+        document.getElementById('tvVideo'),
+        document.getElementById('speaker1'),
+        document.getElementById('speaker2'),
+        null
+      );
+
+      const ps5VideoController = new VideoController(
+        document.getElementById('ps5Video'),
+        document.getElementById('speaker1'),
+        document.getElementById('speaker2'),
+        tvVideoController
+      );
+
+      // Set the other controller for each instance
+      tvVideoController.otherController = ps5VideoController;
+
+      document.getElementById('tvScreen').addEventListener('click', () => tvVideoController.toggleVideo());
+      document.getElementById('ps5Entity').addEventListener('click', () => ps5VideoController.toggleVideo());
+    });
+
+    //Sink
+    AFRAME.registerComponent('bathroomsink', {
+      init: function () {
+        var el = this.el;
+        var waterEntities = document.querySelectorAll('#water1, #water2');
+        var isWaterVisible = false;
+
+        el.addEventListener('click', function () {
+          isWaterVisible = !isWaterVisible;
+
+          if (isWaterVisible) {
+            // Show water by setting the scale
+            waterEntities.forEach(function (entity) {
+              entity.setAttribute('scale', '1 1 1');
+            });
+
+            // Start audio playback
+            el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
+          } else {
+            // Hide water by setting the scale to 0
+            waterEntities.forEach(function (entity) {
+              entity.setAttribute('scale', '0 0 0');
+            });
+
+            // Stop audio playback
+            el.removeAttribute('sound');
+          }
+        });
+      },
+    });
+
+    //Shower
+    AFRAME.registerComponent('shower', {
+      init: function () {
+        var el = this.el;
+        var showerWater = document.getElementById('shower-water');
+        var showerAudio = document.getElementById('showerAudio');
+        var isWaterVisible = false;
+
+        el.addEventListener('click', function () {
+          isWaterVisible = !isWaterVisible;
+
+          if (isWaterVisible) {
+            showerWater.setAttribute('scale', '1 1 1.2');
+
+            showerAudio.play();
+          } else {
+            showerWater.setAttribute('scale', '0 0 0');
+
+            showerAudio.pause();
+            showerAudio.currentTime = 0;
+          }
+        });
+      },
+    });
+
+    //pool shower 
+    AFRAME.registerComponent('pool-shower', {
+      init: function () {
+        var el = this.el;
+        var showerWater = document.getElementById('shower-water-2');
+        var showerAudio = document.getElementById('showerAudio');
+        var isWaterVisible = false;
+
+        el.addEventListener('click', function () {
+          isWaterVisible = !isWaterVisible;
+
+          if (isWaterVisible) {
+            // Show water by setting the scale
+            showerWater.setAttribute('scale', '1 1 1.2');
+
+            // Start audio playback
+            showerAudio.play();
+          } else {
+            // Hide water by setting the scale to 0
+            showerWater.setAttribute('scale', '0 0 0');
+
+            // Stop audio playback
+            showerAudio.pause();
+            showerAudio.currentTime = 0; // Reset the audio to the beginning
+          }
+        });
+      },
+    });
+
+    //Kitchen Sink
+    AFRAME.registerComponent('kitchensink', {
+      init: function () {
+        var el = this.el;
+        var waterEntities = document.querySelectorAll('#water2-1, #water2-2');
+        var isWaterVisible = false;
+
+        el.addEventListener('click', function () {
+          isWaterVisible = !isWaterVisible;
+
+          if (isWaterVisible) {
+            // Show water by setting the scale
+            waterEntities.forEach(function (entity) {
+              entity.setAttribute('scale', '1 1 1');
+            });
+
+            // Start audio playback
+            el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
+          } else {
+            // Hide water by setting the scale to 0
+            waterEntities.forEach(function (entity) {
+              entity.setAttribute('scale', '0 0 0');
+            });
+
+            // Stop audio playback
+            el.removeAttribute('sound');
+          }
+        });
+      },
+    });
+
+    //Gas Stove 
+    AFRAME.registerComponent('stove', {
+
+      init: function () {
+        var el = this.el;
+        var waterEntities = document.querySelectorAll('#gas-stove, #gas-stove-2, #gas-stove-3, #gas-stove-4');
+        var isWaterVisible = false;
+
+        el.addEventListener('click', function () {
+          isWaterVisible = !isWaterVisible;
+
+          if (isWaterVisible) {
+            // Show water by setting the scale
+            waterEntities.forEach(function (entity) {
+              entity.setAttribute('scale', '1 1 1');
+            });
+
+            // Start audio playback
+            el.setAttribute('sound', 'src: #gasAudio; autoplay: true; loop: true');
+          } else {
+            // Hide water by setting the scale to 0
+            waterEntities.forEach(function (entity) {
+              entity.setAttribute('scale', '0 0 0');
+            });
+
+            // Stop audio playback
+            el.removeAttribute('sound');
+          }
+        });
+      },
+    });
+
+    // Teleportation Up
+    AFRAME.registerComponent('teleportation-up', {
+      init: function () {
+        this.el.addEventListener('click', this.teleport.bind(this, '0.860 6.3 -4.182', '1.719 631.285 0'));
+      },
+      teleport: function (position, rotation) {
+        var camera = document.getElementById('cameraRig');
+        var audio = document.getElementById('teleport');
+
+        if (camera) {
+          camera.setAttribute('position', position);
+          camera.setAttribute('rotation', rotation);
+        }
+
+        if (audio) {
+          audio.play();
+        }
+      }
+    });
+
+    // Teleportation down 
+    AFRAME.registerComponent('teleportation-down', {
+      init: function () {
+        this.el.addEventListener('click', this.teleport.bind(this, '4.707 2.200 -5.898', '4.594 539.612 0'));
+      },
+      teleport: function (position, rotation) {
+        var camera = document.getElementById('cameraRig');
+        var audio = document.getElementById('teleport');
+
+        if (camera) {
+          camera.setAttribute('position', position);
+          camera.setAttribute('rotation', rotation);
+        }
+
+        if (audio) {
+          audio.play();
+        }
+      }
+    });
+
+    //Bed door 1 
+    AFRAME.registerComponent('bedroomdoor', {
+      schema: { isOpenBedroom1: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var bedroomdoor = document.getElementById('bedroomdoor-1');
+        var isOpenBedroom1 = bedroomdoor.getAttribute('bedroomdoor').isOpenBedroom1;
+
+        bedroomdoor.setAttribute('bedroomdoor', 'isOpenBedroom1', !isOpenBedroom1);
+
+        var animationDuration = 500;
+        var easing = 'easeInOutQuad';
+
+        bedroomdoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenBedroom1 ? '0 0 0' : '0 -90 0'
+        });
+        bedroomdoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenBedroom1 ? '0.3798 4.10988 1.38675' : '0.895 4.09 2.03074'
+        });
+
+        var audioId = isOpenBedroom1 ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //Bathroom door 2
+    AFRAME.registerComponent('bathroomdoor2', {
+      schema: { isOpenBathroom2: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var bathroomdoor2 = document.getElementById('bathroomdoor-2');
+        var isOpenBathroom2 = bathroomdoor2.getAttribute('bathroomdoor2').isOpenBathroom2;
+
+        bathroomdoor2.setAttribute('bathroomdoor2', 'isOpenBathroom2', !isOpenBathroom2);
+
+        var animationDuration = 500;
+        var easing = 'easeInOutQuad';
+
+        bathroomdoor2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenBathroom2 ? '0 90 0' : '0 180 0'
+        });
+        bathroomdoor2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenBathroom2 ? '0.935 4.10988 2.72942' : '1.42887 4.10988 3.157'
+        });
+
+        var audioId = isOpenBathroom2 ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //Storage door
+    AFRAME.registerComponent('storagedoor2', {
+      schema: { isStoragedoor: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var storagedoor2 = document.getElementById('storagedoorsingle-1');
+        var isStoragedoor = storagedoor2.getAttribute('storagedoor2').isStoragedoor;
+
+        storagedoor2.setAttribute('storagedoor2', 'isStoragedoor', !isStoragedoor);
+
+        var animationDuration = 500;
+        var easing = 'easeInOutQuad';
+
+        storagedoor2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isStoragedoor ? '0 0 0' : '0 90 0'
+        });
+        storagedoor2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isStoragedoor ? '0.3798 4.10988 8.55605' : '-0.16798 4.10988 9.16804'
+        });
+
+        var audioId = isStoragedoor ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //bedroom door2
+    AFRAME.registerComponent('bedroomdoor2', {
+      schema: { isBedroomdoor2: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var bedroomdoor2 = this.el;
+        var isBedroomdoor2 = bedroomdoor2.getAttribute('bedroomdoor2').isBedroomdoor2;
+
+        bedroomdoor2.setAttribute('bedroomdoor2', 'isBedroomdoor2', !isBedroomdoor2);
+
+        var animationDuration = 500;
+        var easing = 'easeInOutQuad';
+
+        bedroomdoor2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isBedroomdoor2 ? '0 180 0' : '0 270 0'
+        });
+        bedroomdoor2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isBedroomdoor2 ? '-10.56676 4.156 8.81517' : '-10.53738 4.156 8.78994'
+        });
+
+        var audioId = isBedroomdoor2 ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //Bathroom door 3 
+    AFRAME.registerComponent('bathroomdoor3', {
+      schema: { isBathroomdoor3: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var bathroomdoor3 = this.el;
+        var isBathroomdoor3 = bathroomdoor3.getAttribute('bathroomdoor3').isBathroomdoor3;
+
+        bathroomdoor3.setAttribute('bathroomdoor3', 'isBathroomdoor3', !isBathroomdoor3);
+
+        var animationDuration = 500;
+        var easing = 'easeInOutQuad';
+
+        bathroomdoor3.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isBathroomdoor3 ? '0 180 0' : '0 90 0'
+        });
+        bathroomdoor3.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isBathroomdoor3 ? '-7.98797 4.156 8.81517' : '-7.99823 4.156 8.91641'
+        });
+
+        var audioId = isBathroomdoor3 ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //Workroom door
+    AFRAME.registerComponent('workroom', {
+      schema: { isWorkroomdoor: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDoor.bind(this));
+      },
+      toggleDoor: function () {
+        var workroomdoor = this.el;
+        var isWorkroomdoor = workroomdoor.getAttribute('workroom').isWorkroomdoor;
+
+        workroomdoor.setAttribute('workroom', 'isWorkroomdoor', !isWorkroomdoor);
+
+        var animationDuration = 500;
+        var easing = 'easeInOutQuad';
+
+        workroomdoor.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isWorkroomdoor ? '0 180 0' : '0 270 0'
+        });
+        workroomdoor.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isWorkroomdoor ? '-4.28127 4.156 8.81517' : '-4.23575 4.156 8.76495'
+        });
+
+        var audioId = isWorkroomdoor ? 'closeDoorAudio' : 'openDoorAudio';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //shower3
+    AFRAME.registerComponent('shower2', {
+      init: function () {
+        var el = this.el;
+        var showerWater = document.getElementById('shower-water-3');
+        var showerAudio = document.getElementById('showerAudio');
+        var isWaterVisible = false;
+
+        el.addEventListener('click', function () {
+          isWaterVisible = !isWaterVisible;
+
+          if (isWaterVisible) {
+            showerWater.setAttribute('scale', '1 1 1.2');
+
+            showerAudio.play();
+          } else {
+            showerWater.setAttribute('scale', '0 0 0');
+
+            showerAudio.pause();
+            showerAudio.currentTime = 0;
+          }
+        });
+      },
+    });
+
+    //shower4
+    AFRAME.registerComponent('shower3', {
+      init: function () {
+        var el = this.el;
+        var showerWater = document.getElementById('shower-water-4');
+        var showerAudio = document.getElementById('showerAudio');
+        var isWaterVisible = false;
+
+        el.addEventListener('click', function () {
+          isWaterVisible = !isWaterVisible;
+
+          if (isWaterVisible) {
+            showerWater.setAttribute('scale', '1 1 1.2');
+
+            showerAudio.play();
+          } else {
+            showerWater.setAttribute('scale', '0 0 0');
+
+            showerAudio.pause();
+            showerAudio.currentTime = 0;
+          }
+        });
+      },
+    });
+
+    //bathroom Sink 2
+    AFRAME.registerComponent('bathroomsink2', {
+      init: function () {
+        var el = this.el;
+        var waterEntities = document.querySelectorAll('#water2-4, #water2-3');
+        var isWaterVisible = false;
+
+        el.addEventListener('click', function () {
+          isWaterVisible = !isWaterVisible;
+
+          if (isWaterVisible) {
+            // Show water by setting the scale
+            waterEntities.forEach(function (entity) {
+              entity.setAttribute('scale', '1 1 1');
+            });
+
+            // Start audio playback
+            el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
+          } else {
+            // Hide water by setting the scale to 0
+            waterEntities.forEach(function (entity) {
+              entity.setAttribute('scale', '0 0 0');
+            });
+
+            el.removeAttribute('sound');
+          }
+        });
+      },
+    });
+
+    //Tv2
+    document.addEventListener('DOMContentLoaded', function () {
+      const HIDDEN_SCALE = '0 0 0';
+
+      class VideoController {
+        constructor(videoEntity) {
+          this.videoEntity = videoEntity;
+          this.isVideoPlaying = false;
+        }
+
+        toggleVideo() {
+          if (this.isVideoPlaying) {
+            this.pauseAndHideVideo();
+          } else {
+            this.playVideo();
+          }
+          this.isVideoPlaying = !this.isVideoPlaying;
+        }
+
+        pauseAndHideVideo() {
+          this.pauseVideo();
+          this.hideVideoBox();
+        }
+
+        pauseVideo() {
+          this.videoEntity.components.material.material.map.image.pause();
+        }
+
+        playVideo() {
+          this.videoEntity.components.material.material.map.image.play();
+          this.showVideoBox();
+        }
+
+        hideVideoBox() {
+          this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
+        }
+
+        showVideoBox() {
+          this.videoEntity.setAttribute('scale', '1 1 1');
+        }
+      }
+
+      const tvVideoController2 = new VideoController(
+        document.getElementById('tvVideo2')
+      );
+
+      document.getElementById('tvScreen2').addEventListener('click', () => tvVideoController2.toggleVideo());
+    });
+
+    //Tv3
+    document.addEventListener('DOMContentLoaded', function () {
+      const HIDDEN_SCALE = '0 0 0';
+
+      class VideoController {
+        constructor(videoEntity) {
+          this.videoEntity = videoEntity;
+          this.isVideoPlaying = false;
+        }
+
+        toggleVideo() {
+          if (this.isVideoPlaying) {
+            this.pauseAndHideVideo();
+          } else {
+            this.playVideo();
+          }
+          this.isVideoPlaying = !this.isVideoPlaying;
+        }
+
+        pauseAndHideVideo() {
+          this.pauseVideo();
+          this.hideVideoBox();
+        }
+
+        pauseVideo() {
+          this.videoEntity.components.material.material.map.image.pause();
+        }
+
+        playVideo() {
+          this.videoEntity.components.material.material.map.image.play();
+          this.showVideoBox();
+        }
+
+        hideVideoBox() {
+          this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
+        }
+
+        showVideoBox() {
+          this.videoEntity.setAttribute('scale', '1 1 1');
+        }
+      }
+
+      const tvVideoController3 = new VideoController(
+        document.getElementById('tvVideo3')
+      );
+
+      document.getElementById('tvScreen3').addEventListener('click', () => tvVideoController3.toggleVideo());
+    });
+
+    //Bedroom drawer 
+    AFRAME.registerComponent('drawer', {
+      schema: { isOpen: { default: false } },
+      init: function () {
+        this.el.addEventListener('click', this.toggleDrawer.bind(this));
+      },
+      toggleDrawer: function () {
+        var drawerDoor1 = document.getElementById('bedroom-drawerdoor-1');
+        var drawerDoor2 = document.getElementById('bedroom-drawerdoor-2');
+        var handle1 = document.getElementById('bedroom-drawerhandle-1');
+        var handle2 = document.getElementById('bedroom-drawerhandle-2');
+
+        var isOpen1 = drawerDoor1.getAttribute('drawer').isOpen;
+        var isOpen2 = drawerDoor2.getAttribute('drawer').isOpen;
+
+        drawerDoor1.setAttribute('drawer', 'isOpen', !isOpen1);
+        drawerDoor2.setAttribute('drawer', 'isOpen', !isOpen2);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        drawerDoor1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen1 ? '0 90 0' : '0 0 0'
+        });
+        drawerDoor1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen1 ? '-10.67799 6.16619 14.81062' : '-10.37309 6.16619 14.48496'
+        });
+
+        handle1.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen1 ? '0 90 0' : '0 0 0'
+        });
+        handle1.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen1 ? '-10.85146 6.0617 14.76944' : '-10.32767 6.0617 14.76944'
+        });
+
+        drawerDoor2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen2 ? '0 90 0' : '0 180 0'
+        });
+        drawerDoor2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen2 ? '-11.30407 6.16619 14.81062' : '-11.59647 6.16619 14.485'
+        });
+
+        handle2.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen2 ? '0 90 0' : '0 180 0'
+        });
+        handle2.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpen2 ? '-11.15203 6.0617 14.76944' : '-11.61043 6.14433 14.3187'
+        });
+
+        var audioId = isOpen1 || isOpen2 ? 'drawerOpen' : 'drawerClose';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //waredrobe 1
+    AFRAME.registerComponent('waredrobe1', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleWardrobe.bind(this));
+      },
+      toggleWardrobe: function () {
+        var wardrobe = document.getElementById('waredrobe-1');
+        var handle = document.getElementById('waredrobe-handle-1');
+        var isOpenW1 = wardrobe.getAttribute('waredrobe1').isOpenW1;
+
+        wardrobe.setAttribute('waredrobe1', 'isOpenW1', !isOpenW1);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        wardrobe.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW1 ? '0 90 0' : '0 0 0'
+        });
+        wardrobe.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW1 ? '2.04402 5.62826 6.08177' : '2.36575 5.62826 5.74016'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW1 ? '0 90 0' : '0 0 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW1 ? '1.89459 5.24249 6.06963' : '2.40826 5.24249 6.06963'
+        });
+
+        var audioId = isOpenW1 ? 'drawerOpen' : 'drawerClose';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //waredrobe 2
+    AFRAME.registerComponent('waredrobe2', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleWardrobe.bind(this));
+      },
+      toggleWardrobe: function () {
+        var wardrobe = document.getElementById('waredrobe-2');
+        var handle = document.getElementById('waredrobe-handle-2');
+        var isOpenW2 = wardrobe.getAttribute('waredrobe2').isOpenW2;
+
+        wardrobe.setAttribute('waredrobe2', 'isOpenW2', !isOpenW2);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        wardrobe.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW2 ? '0 90 0' : '0 0 0'
+        });
+        wardrobe.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW2 ? '1.4411 5.38949 6.08177' : '1.71318 5.38949 5.80648'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW2 ? '0 90 0' : '0 0 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW2 ? '1.26638 5.24249 6.06963' : '1.72692 5.24249 5.62909'
+        });
+
+        var audioId = isOpenW2 ? 'drawerOpen' : 'drawerClose';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+    //waredrobe 3
+    AFRAME.registerComponent('waredrobe3', {
+      init: function () {
+        this.el.addEventListener('click', this.toggleWardrobe.bind(this));
+      },
+      toggleWardrobe: function () {
+        var wardrobe = document.getElementById('waredrobe-3');
+        var handle = document.getElementById('waredrobe-handle-3');
+        var isOpenW3 = wardrobe.getAttribute('waredrobe3').isOpenW3;
+
+        wardrobe.setAttribute('waredrobe3', 'isOpenW3', !isOpenW3);
+
+        var animationDuration = 0;
+        var easing = 'easeInOutQuad';
+
+        wardrobe.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW3 ? '0 90 0' : '0 0 0'
+        });
+        wardrobe.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW3 ? '0.80723 5.1383 6.08177' : '0.47328 5.1383 5.71895'
+        });
+
+        handle.setAttribute('animation__rotation', {
+          property: 'rotation',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW3 ? '0 90 0' : '0 0 0'
+        });
+        handle.setAttribute('animation__position', {
+          property: 'position',
+          dur: animationDuration,
+          easing: easing,
+          to: isOpenW3 ? '1.02716 5.24249 6.06963' : '0.45464 5.24249 5.56757'
+        });
+
+        var audioId = isOpenW3 ? 'drawerOpen' : 'drawerClose';
+        var audio = document.getElementById(audioId);
+
+        if (audio && audio.readyState >= 2) {
+          audio.play();
+        } else {
+          audio.addEventListener('loadeddata', function () {
+            audio.play();
+          });
+        }
+      }
+    });
+
+  </script>
+  <!---===========================================================================JS end=========================================================================-->
 
     <!--=====================================================================Interactable=========================================================================================-->
+  
+
     <!--Entrance doors-->
     <!-- Door left -->
-    <a-entity id="double-door-1" door="isOpen: false" class="intersectable" static-body="" position="-9.17592 0.52224 3.31"
-      gltf-model="#double-door" scale="1.5 1.2 1.485" rotation="0 270 0" door></a-entity>
+    <a-entity id="double-door-1" door="isOpen: false" class="intersectable" static-body=""
+      position="-9.17592 0.52224 3.31" gltf-model="#double-door" scale="1.5 1.2 1.485" rotation="0 270 0"
+      door></a-entity>
 
     <!-- Door right -->
-    <a-entity id="double-door-2" door="isOpen: false" class="intersectable" static-body="" position="-10.687 0.51933 3.31"
-      gltf-model="#double-door" scale="1.5 1.2 1.485" rotation="0 90 0" door></a-entity>
+    <a-entity id="double-door-2" door="isOpen: false" class="intersectable" static-body=""
+      position="-10.687 0.51933 3.31" gltf-model="#double-door" scale="1.5 1.2 1.485" rotation="0 90 0" door></a-entity>
 
     <!--=========================================================================================-->
 
     <!-- Back doors -->
-    <a-entity id="back-double-door-1" backdoor="isOpen: false" class="intersectable" static-body="" position="-0.11894 0.55543 10.013"
-      gltf-model="#double-door" scale="1.5 1.15 1.55" rotation="0 90 0" backdoor></a-entity>
+    <a-entity id="back-double-door-1" backdoor="isOpen: false" class="intersectable" static-body=""
+      position="-0.11894 0.55543 10.013" gltf-model="#double-door" scale="1.5 1.15 1.55" rotation="0 90 0"
+      backdoor></a-entity>
 
-    <a-entity id="back-double-door-2" backdoor="isOpen: false" class="intersectable" static-body="" position="1.45762 0.55543 10.013"
-      gltf-model="#double-door" scale="1.5 1.15 1.55" rotation="0 270 0" backdoor></a-entity>
+    <a-entity id="back-double-door-2" backdoor="isOpen: false" class="intersectable" static-body=""
+      position="1.45762 0.55543 10.013" gltf-model="#double-door" scale="1.5 1.15 1.55" rotation="0 270 0"
+      backdoor></a-entity>
 
     <!--=========================================================================================-->
 
@@ -473,2037 +2470,179 @@
     </a-entity>
 
     <!--Tele up -->
-    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-1.963 5.85 3.4191" material="src: #black" scale="1.5 2 2" rotation="0 90 0.01" teleportation-down></a-entity>
-    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.25" position="-1.96863 5.84108 3.4684" material="src: #steel" scale="" rotation="0 90 90" teleportation-down></a-entity>
+    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-1.963 5.85 3.4191"
+      material="src: #black" scale="1.5 2 2" rotation="0 90 0.01" teleportation-down></a-entity>
+    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.25"
+      position="-1.96863 5.84108 3.4684" material="src: #steel" scale="" rotation="0 90 90"
+      teleportation-down></a-entity>
 
     <!--tele down-->
-    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-5.20485 2.345 4.41982" material="src: #black" scale="1 2 2" rotation="0 0 0.01" teleportation-up></a-entity>
-    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.25" position="-5.16097 2.345 4.44403" material="src: #steel" scale="" rotation="0 0 90" teleportation-up></a-entity>
+    <a-entity class="intersectable" geometry="depth: 0.3; height: 0.3; width: 0.054" position="-5.20485 2.345 4.41982"
+      material="src: #black" scale="1 2 2" rotation="0 0 0.01" teleportation-up></a-entity>
+    <a-entity class="intersectable" geometry="height: 0.04; primitive: cylinder; radius: 0.25"
+      position="-5.16097 2.345 4.44403" material="src: #steel" scale="" rotation="0 0 90" teleportation-up></a-entity>
 
     <!-- Bedroom door -->
-    <a-entity class="intersectable" id="bedroomdoor-1" gltf-model="#door" position="0.3798 4.10988 1.38675" scale="0.3 0.3 0.3" rotation="" bedroomdoor></a-entity>
+    <a-entity class="intersectable" id="bedroomdoor-1" gltf-model="#door" position="0.3798 4.10988 1.38675"
+      scale="0.3 0.3 0.3" rotation="" bedroomdoor></a-entity>
 
     <!--Bathroom 2 door-->
-    <a-entity class="intersectable" id="bathroomdoor-2" gltf-model="#door" position="0.935 4.10988 2.72942" scale="0.3 0.3 0.25" rotation="0 90 0" bathroomdoor2></a-entity>
+    <a-entity class="intersectable" id="bathroomdoor-2" gltf-model="#door" position="0.935 4.10988 2.72942"
+      scale="0.3 0.3 0.25" rotation="0 90 0" bathroomdoor2></a-entity>
 
     <!--storage room door-->
-    <a-entity class="intersectable" id="storagedoorsingle-1" gltf-model="#door" position="0.3798 4.10988 8.55605" scale="0.3 0.3 0.3" rotation="" storagedoor2></a-entity>
+    <a-entity class="intersectable" id="storagedoorsingle-1" gltf-model="#door" position="0.3798 4.10988 8.55605"
+      scale="0.3 0.3 0.3" rotation="" storagedoor2></a-entity>
 
     <!--bedroom Door 2-->
-    <a-entity class="intersectable" id="bedroomdoor2" gltf-model="#door2" position="-10.56676 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0" bedroomdoor2></a-entity>
+    <a-entity class="intersectable" id="bedroomdoor2" gltf-model="#door2" position="-10.56676 4.156 8.81517"
+      scale="0.85 1 1" rotation="0 180 0" bedroomdoor2></a-entity>
 
     <!--bathroom door3-->
-    <a-entity class="intersectable" id="bathroomdoor-3" gltf-model="#door2" position="-7.98797 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0" bathroomdoor3></a-entity>
+    <a-entity class="intersectable" id="bathroomdoor-3" gltf-model="#door2" position="-7.98797 4.156 8.81517"
+      scale="0.85 1 1" rotation="0 180 0" bathroomdoor3></a-entity>
 
     <!--workroom door-->
-    <a-entity class="intersectable" id="workroomdoor" gltf-model="#door2" position="-4.28127 4.156 8.81517" scale="0.85 1 1" rotation="0 180 0" workroom></a-entity>
+    <a-entity class="intersectable" id="workroomdoor" gltf-model="#door2" position="-4.28127 4.156 8.81517"
+      scale="0.85 1 1" rotation="0 180 0" workroom></a-entity>
 
     <!--Shower 2-->
-    <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="3.84412 5.88993 7.04127"
-      material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2" shower2></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06"
+      position="3.84412 5.88993 7.04127" material="src: images/steel.jpg" rotation="0 90 0" scale="1 1 1.2"
+      shower2></a-entity>
     <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="3.96046 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2" shower2></a-entity>
+      position="3.96046 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0" scale="1 1 1.2"
+      shower2></a-entity>
     <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="3.85295 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2" shower2></a-entity>
+      position="3.85295 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0" scale="1 1 1.2"
+      shower2></a-entity>
     <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="3.74866 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0"
-      scale="1 1 1.2" shower2></a-entity>
+      position="3.74866 5.97627 6.99834" material="src: images/metal-solid.jpg" rotation="90 0 0" scale="1 1 1.2"
+      shower2></a-entity>
 
-    <a-entity id="shower-water-3" geometry="width: 0.35; height: 3; depth: 0.35" material="color: #00ace6; opacity: 0.7; transparent: true; roughness: 0.1" position="3.36582 5.42514 6.57116" rotation="0 90 0" scale="0 0 0" sound="src: #showerAudio"></a-entity>
-    
+    <a-entity id="shower-water-3" geometry="width: 0.35; height: 3; depth: 0.35"
+      material="color: #00ace6; opacity: 0.7; transparent: true; roughness: 0.1" position="3.36582 5.42514 6.57116"
+      rotation="0 90 0" scale="0 0 0" sound="src: #showerAudio"></a-entity>
+
     <!--Shower 3-->
     <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.06"
-    position="-7.04681 5.9701 10.88364" material="src: images/metal-solid.jpg" rotation="90 0 90"
-    scale="1 1 1.2" shower3></a-entity>
-    <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06" position="-7.00462 6.03595 10.88698"
-      material="src: images/steel.jpg" rotation="" scale="1 1 1.2" shower3></a-entity>
+      position="-7.04681 5.9701 10.88364" material="src: images/metal-solid.jpg" rotation="90 0 90" scale="1 1 1.2"
+      shower3></a-entity>
+    <a-entity class="intersectable" static-body="" geometry="depth: 0.3; height: 0.3; width: 0.06"
+      position="-7.00462 6.03595 10.88698" material="src: images/steel.jpg" rotation="" scale="1 1 1.2"
+      shower3></a-entity>
     <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-7.04681 6.11457 10.78262" material="src: images/metal-solid.jpg" rotation="90 0 90"
-      scale="1 1 1.2" shower3></a-entity>
+      position="-7.04681 6.11457 10.78262" material="src: images/metal-solid.jpg" rotation="90 0 90" scale="1 1 1.2"
+      shower3></a-entity>
     <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-7.04681 6.11457 10.88364" material="src: images/metal-solid.jpg" rotation="90 0 90"
-      scale="1 1 1.2" shower3></a-entity>
+      position="-7.04681 6.11457 10.88364" material="src: images/metal-solid.jpg" rotation="90 0 90" scale="1 1 1.2"
+      shower3></a-entity>
     <a-entity class="intersectable" static-body="" geometry="height: 0.05; primitive: cylinder; radius: 0.04"
-      position="-7.04681 6.11457 10.98175" material="src: images/metal-solid.jpg" rotation="90 0 90"
-      scale="1 1 1.2" shower3></a-entity>
+      position="-7.04681 6.11457 10.98175" material="src: images/metal-solid.jpg" rotation="90 0 90" scale="1 1 1.2"
+      shower3></a-entity>
 
-    <a-entity id="shower-water-4" geometry="width: 0.35; height: 3; depth: 0.35" material="color: #00ace6; opacity: 0.7; transparent: true; roughness: 0.1" position="-7.50161 5.44642 11.37197" rotation="" scale="0 0 0" sound="src: #showerAudio"></a-entity>
-    
+    <a-entity id="shower-water-4" geometry="width: 0.35; height: 3; depth: 0.35"
+      material="color: #00ace6; opacity: 0.7; transparent: true; roughness: 0.1" position="-7.50161 5.44642 11.37197"
+      rotation="" scale="0 0 0" sound="src: #showerAudio"></a-entity>
+
     <!--Toilet 2-->
-    <a-entity id="toiletEntity2" class="intersectable"  gltf-model="#toilet" position="3.6774 4.13491 3.18287" scale="0.015 0.015 0.015" rotation="" sound="on: click; src: #toiletAudio"></a-entity>
+    <a-entity id="toiletEntity2" class="intersectable" gltf-model="#toilet" position="3.6774 4.13491 3.18287"
+      scale="0.015 0.015 0.015" rotation="" sound="on: click; src: #toiletAudio"></a-entity>
 
     <!--Toilet 3-->
-    <a-entity id="toiletEntity3" class="intersectable" gltf-model="#toilet" position="-7.27823 4.14115 9.54463" scale="0.015 0.015 0.015"
-      rotation="0 270 0" sound="on: click; src: #toiletAudio"></a-entity>
+    <a-entity id="toiletEntity3" class="intersectable" gltf-model="#toilet" position="-7.27823 4.14115 9.54463"
+      scale="0.015 0.015 0.015" rotation="0 270 0" sound="on: click; src: #toiletAudio"></a-entity>
 
     <!--Sink2-->
-    <a-entity id="bathroomsink2" class="intersectable" gltf-model="#b-sink" position="-9.83049 5.19579 9.81031" scale="0.012 0.015 0.015" rotation="" bathroomsink2></a-entity>
-    <a-entity id="water2-4" geometry="height: 0.03; depth: 0.66; width: 0.29" material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="-9.83709 5.31611 9.80461" scale="0 0 0"></a-entity>
-    <a-entity id="water2-3" geometry="height: 0.24; primitive: cylinder; radius: 0.01" material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="-9.88269 5.4089 9.80461" scale="0 0 0"></a-entity>
+    <a-entity id="bathroomsink2" class="intersectable" gltf-model="#b-sink" position="-9.83049 5.19579 9.81031"
+      scale="0.012 0.015 0.015" rotation="" bathroomsink2></a-entity>
+    <a-entity id="water2-4" geometry="height: 0.03; depth: 0.66; width: 0.29"
+      material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="-9.83709 5.31611 9.80461"
+      scale="0 0 0"></a-entity>
+    <a-entity id="water2-3" geometry="height: 0.24; primitive: cylinder; radius: 0.01"
+      material="color: #006eff; opacity: 0.7; transparent: true; roughness: 0.1" position="-9.88269 5.4089 9.80461"
+      scale="0 0 0"></a-entity>
 
     <!--Tv2-->
-    <a-entity id="tvScreen2" class="intersectable" static-body="" geometry="depth: 2; height: 1.2; width: 0.02" position="2.71119 5.779 2.52708"
-    material="src: images/tv.png" scale="" rotation="0 90 0" tv2 >
-    <a-video id="tvVideo2" src="#tv-video2" width="2" height="1.2" loop="true" scale="0 0 0" position="0.014 0 0"
-    rotation="0 90  0"></a-video></a-entity>
+    <a-entity id="tvScreen2" class="intersectable" static-body="" geometry="depth: 2; height: 1.2; width: 0.02"
+      position="2.71119 5.779 2.52708" material="src: images/tv.png" scale="" rotation="0 90 0" tv2>
+      <a-video id="tvVideo2" src="#tv-video2" width="2" height="1.2" loop="true" scale="0 0 0" position="0.014 0 0"
+        rotation="0 90  0"></a-video></a-entity>
 
     <!--Tv3-->
-    <a-entity id="tvScreen3" class="intersectable" static-body="" geometry="depth: 2; height: 1.2; width: 0.02" position="-10.51476 6.59185 11.53336"
-    material="src: images/tv.png" scale="" rotation=""  tv3>
-    <a-video id="tvVideo3" src="#tv-video3" width="2" height="1.2" loop="true" scale="0 0 0" position="-0.014 0 0"   rotation="0 90  0"></a-video>
+    <a-entity id="tvScreen3" class="intersectable" static-body="" geometry="depth: 2; height: 1.2; width: 0.02"
+      position="-10.51476 6.59185 11.53336" material="src: images/tv.png" scale="" rotation="" tv3>
+      <a-video id="tvVideo3" src="#tv-video3" width="2" height="1.2" loop="true" scale="0 0 0" position="-0.014 0 0"
+        rotation="0 270  0"></a-video>
     </a-entity>
 
     <!--bedroom drawer-->
-    <a-entity id="bedroom-drawerdoor-1" class="intersectable" static-body="" geometry="depth: 0.63; height: 1.93; width: 0.02" position="-10.67799 6.16619 14.81062"
-    material="src: images/dark-texture.jpg"  rotation="0 90 0" drawer></a-entity>
-    <a-entity id="bedroom-drawerdoor-2" class="intersectable"   static-body="" geometry="depth: 0.62; height: 1.93; width: 0.02" position="-11.30407 6.16619 14.81062"
-    material="src: images/dark-texture.jpg" rotation="0 90 0" drawer></a-entity>
-    
+    <a-entity id="bedroom-drawerdoor-1" class="intersectable" static-body=""
+      geometry="depth: 0.63; height: 1.93; width: 0.02" position="-10.67799 6.16619 14.81062"
+      material="src: images/dark-texture.jpg" rotation="0 90 0" drawer></a-entity>
+    <a-entity id="bedroom-drawerdoor-2" class="intersectable" static-body=""
+      geometry="depth: 0.62; height: 1.93; width: 0.02" position="-11.30407 6.16619 14.81062"
+      material="src: images/dark-texture.jpg" rotation="0 90 0" drawer></a-entity>
+
     <!--drawer handles-->
-    <a-entity id="bedroom-drawerhandle-1" class="intersectable"  static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="-10.85146 6.0617 14.76944"
-    material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" drawer></a-entity>
-    <a-entity id="bedroom-drawerhandle-2" class="intersectable"  static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="-11.15203 6.0617 14.76944"
+    <a-entity id="bedroom-drawerhandle-1" class="intersectable" static-body=""
+      geometry="depth: 0.03; height: 0.3; width: 0.02" position="-10.85146 6.0617 14.76944"
+      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" drawer></a-entity>
+    <a-entity id="bedroom-drawerhandle-2" class="intersectable" static-body=""
+      geometry="depth: 0.03; height: 0.3; width: 0.02" position="-11.15203 6.0617 14.76944"
       material="src: images/metal-solid.jpg" rotation="0 180 0" scale="1 1 1.2" drawer></a-entity>
 
     <!--Waredrobe 1-->
-    <a-entity id="waredrobe-1" class="intersectable" static-body="" geometry="depth: 0.64; height: 2.98; width: 0.02" position="2.04402 5.62826 6.08177"
-      material="src: images/dark-texture.jpg" rotation="0 90 0" waredrobe1></a-entity>
-      <a-entity id="waredrobe-handle-1" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.89459 5.24249 6.06963"
+    <a-entity id="waredrobe-1" class="intersectable" static-body="" geometry="depth: 0.64; height: 2.98; width: 0.02"
+      position="2.04402 5.62826 6.08177" material="src: images/dark-texture.jpg" rotation="0 90 0"
+      waredrobe1></a-entity>
+    <a-entity id="waredrobe-handle-1" class="intersectable" static-body=""
+      geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.89459 5.24249 6.06963"
       material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" waredrobe1></a-entity>
-    <!--Waredrobe 2-->   
-    <a-entity id="waredrobe-2" class="intersectable" static-body="" geometry="depth: 0.57; height: 1.5; width: 0.02" position="1.4411 5.38949 6.08177"
-      material="src: images/dark-texture.jpg" rotation="0 90 0" waredrobe2></a-entity>
-      <a-entity id="waredrobe-handle-2" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.26638 5.24249 6.06963"
-      material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" waredrobe2></a-entity>
+    <!--Waredrobe 2-->
+    <a-entity id="waredrobe-2" class="intersectable" static-body="" geometry="depth: 0.57; height: 1.5; width: 0.02"
+      position="1.4411 5.38949 6.08177" material="src: images/dark-texture.jpg" rotation="0 90 0" waredrobe2></a-entity>
+    <a-entity id="waredrobe-handle-2" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02"
+      position="1.26638 5.24249 6.06963" material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2"
+      waredrobe2></a-entity>
     <!--Waredrobe 3-->
-    <a-entity id="waredrobe-3" class="intersectable" static-body="" geometry="depth: 0.68; height: 2; width: 0.02" position="0.80723 5.1383 6.08177"
-      material="src: images/dark-texture.jpg" rotation="0 90 0" waredrobe3></a-entity>
-    <a-entity id="waredrobe-handle-3" class="intersectable" static-body="" geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.02716 5.24249 6.06963"
+    <a-entity id="waredrobe-3" class="intersectable" static-body="" geometry="depth: 0.68; height: 2; width: 0.02"
+      position="0.80723 5.1383 6.08177" material="src: images/dark-texture.jpg" rotation="0 90 0" waredrobe3></a-entity>
+    <a-entity id="waredrobe-handle-3" class="intersectable" static-body=""
+      geometry="depth: 0.03; height: 0.3; width: 0.02" position="1.02716 5.24249 6.06963"
       material="src: images/metal-solid.jpg" rotation="0 90 0" scale="1 1 1.2" waredrobe3></a-entity>
-  
-    <!--=====================================================================Interactable End=========================================================================================-->
 
-    <!--============================================================================JS=============================================================================-->
-
-    <script>
-      //Entrance door
-      AFRAME.registerComponent('door', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoors.bind(this));
-          // Set the initial rotation for door1 based on the isOpen attribute
-          if (this.el.id === 'double-door-1') {
-            this.updateRotation();
-          }
-        },
-        toggleDoors: function () {
-          var door1 = document.getElementById('double-door-1');
-          var door2 = document.getElementById('double-door-2');
-      
-          var isOpen1 = door1.getAttribute('door').isOpen;
-          var isOpen2 = door2.getAttribute('door').isOpen;
-      
-          door1.setAttribute('door', 'isOpen', !isOpen1);
-          door2.setAttribute('door', 'isOpen', !isOpen2);
-      
-          var animationDuration = 400;
-          var easing = 'easeInOutQuad';
-      
-          door1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen1 ? '-8.49563 0.52224 3.96794' : '-9.17592 0.52224 3.31'
-          });
-          door1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen1 ? '0 0 0' : '0 -90 0'
-          });
-      
-          door2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen2 ? '-11.452 0.519 3.968' : '-10.687 0.51933 3.31'
-          });
-          door2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen2 ? '0 0 0' : '0 90 0'
-          });
-      
-          var audioId = isOpen1 || isOpen2 ? 'closeDoorAudio' : 'openDoorAudio';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        },
-        updateRotation: function () {
-          // Set the initial rotation for door1 based on the isOpen attribute
-          var isOpen = this.el.getAttribute('door').isOpen;
-          var initialRotation = isOpen ? '0 -90 0' : '0 0 0';
-          this.el.setAttribute('rotation', initialRotation);
-        }
-      });
-      
-      //back Doors
-      AFRAME.registerComponent('backdoor', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoors.bind(this));
-          // Set the initial rotation for backDoor2 based on the isOpen attribute
-          if (this.el.id === 'back-double-door-2') {
-            this.updateRotation();
-          }
-        },
-        toggleDoors: function () {
-          var backDoor1 = document.getElementById('back-double-door-1');
-          var backDoor2 = document.getElementById('back-double-door-2');
-      
-          var isOpenBack1 = backDoor1.getAttribute('backdoor').isOpen;
-          var isOpenBack2 = backDoor2.getAttribute('backdoor').isOpen;
-      
-          backDoor1.setAttribute('backdoor', 'isOpen', !isOpenBack1);
-          backDoor2.setAttribute('backdoor', 'isOpen', !isOpenBack2);
-      
-          var animationDuration = 400;
-          var easing = 'easeInOutQuad';
-      
-          backDoor1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenBack1 ? '-0.87091 0.555 10.70427' : '-0.11894 0.55543 10.013'
-          });
-          backDoor1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenBack1 ? '0 0 0' : '0 90 0'
-          });
-      
-          backDoor2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenBack2 ? '2.13587 0.55543 10.71952' : '1.45762 0.55543 10.013'
-          });
-          backDoor2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenBack2 ? '0 0 0' : '0 -90 0'
-          });
-      
-          var audioId = isOpenBack1 || isOpenBack2 ? 'closeDoorAudio' : 'openDoorAudio';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        },
-        updateRotation: function () {
-          // Set the initial rotation for backDoor2 based on the isOpen attribute
-          var isOpen = this.el.getAttribute('backdoor').isOpen;
-          var initialRotation = isOpen ? '0 -90 0' : '0 0 0';
-          this.el.setAttribute('rotation', initialRotation);
-        }
-      });      
-      
-      //Bathroom door
-      AFRAME.registerComponent('bathroomdoor', {
-        schema: { isOpenB: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var bathroomDoor = document.getElementById('bathroom-door-1');
-          var isOpenB = bathroomDoor.getAttribute('bathroomdoor').isOpenB;
-      
-          bathroomDoor.setAttribute('bathroomdoor', 'isOpenB', !isOpenB);
-
-          var animationDuration = 600;  
-          var easing = 'easeInOutQuad';
-      
-          bathroomDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenB ? '0 180 0' : '0 270 0'
-          });
-          bathroomDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenB ? '-1.48867 0.54 8.63875' : '-1.01557 0.54 8.07976'
-          });
-
-          var audioId = isOpenB ? 'closeDoorAudio' : 'openDoorAudio';
-          var audio = document.getElementById(audioId);
-
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //pool door
-      AFRAME.registerComponent('pooldoor', {
-        schema: { isOpenP: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var poolDoor = document.getElementById('pool-door');
-          var isOpenP = poolDoor.getAttribute('pooldoor').isOpenP;
-
-          poolDoor.setAttribute('pooldoor', 'isOpenP', !isOpenP);
-
-          var animationDuration = 600;  
-          var easing = 'easeInOutQuad';  
-
-          poolDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenP ? '0 180 0' : '0 90 0'
-          });
-          poolDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenP ? '-9.62711 1.83002 8.82728' : '-9.627 1.83002 8.67283'
-          });
-
-          var audioId = isOpenP ? 'closeDoorAudio' : 'openDoorAudio';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //refrigerator
-      AFRAME.registerComponent('fridgedoor', {
-        schema: { isOpenF: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoors.bind(this));
-        },
-        toggleDoors: function () {
-          var fridgeDoor1 = document.getElementById('fridge-door-1');
-          var fridgeDoor2 = document.getElementById('fridge-door-2');
-          var handle1 = document.getElementById('handle1');
-          var handle2 = document.getElementById('handle2');
-      
-          var isOpenF1 = fridgeDoor1.getAttribute('fridgedoor').isOpenF;
-          var isOpenF2 = fridgeDoor2.getAttribute('fridgedoor').isOpenF;
-
-          fridgeDoor1.setAttribute('fridgedoor', 'isOpenF', !isOpenF1);
-          fridgeDoor2.setAttribute('fridgedoor', 'isOpenF', !isOpenF2);
-
-          var animationDuration = 0; 
-          var easing = 'easeInOutQuad';  
-      
-          fridgeDoor1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenF1 ? '0 0 0' : '0 -100 0'
-          });
-          fridgeDoor1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenF1 ? '-0.22207 1.86745 2.12807' : '0.10934 1.86745 2.49779'
-          });
-      
-          handle1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenF1 ? '0 0 0' : '0 -100 0'
-          });
-          handle1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenF1 ? '-0.09834 2.0126 1.90948' : '0.33928 2.0126 2.56258'
-          });
-      
-          fridgeDoor2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenF2 ? '0 0 0' : '0 100 0'
-          });
-          fridgeDoor2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenF2 ? '-0.22207 1.86714 1.3806' : '0.096 1.86714 0.97803'
-          });
-      
-          handle2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenF2 ? '0 0 0' : '0 100 0'
-          });
-          handle2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenF2 ? '-0.09834 2.0126 1.60382' : '0.3463 2.0126 0.90191'
-          });
-
-          var audioId = isOpenF1 || isOpenF2 ? 'openFridge' : 'closeFridge';
-          var audio = document.getElementById(audioId);
-
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () { audio.play(); });
-          }
-
-          var fridgeRunningSound = document.getElementById('Fridge');
-
-          if (isOpenF1 || isOpenF2) {
-            fridgeRunningSound.pause();
-            fridgeRunningSound.loop = true;
-          } else {
-            fridgeRunningSound.play();
-            fridgeRunningSound.currentTime = 0;
-            fridgeRunningSound.loop = false;
-          }
-        }
-      });
-      
-      //Storage doors
-      AFRAME.registerComponent('storagedoor', {
-        schema: { isOpenS: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoors.bind(this));
-        },
-        toggleDoors: function () {
-          var storageDoor1 = document.getElementById('storage-door-1');
-          var storageDoor2 = document.getElementById('storage-door-2');
-          var handle1 = document.getElementById('handle-storage-1');
-          var handle2 = document.getElementById('handle-storage-2');
-      
-          var isOpenS1 = storageDoor1.getAttribute('storagedoor').isOpenS;
-          var isOpenS2 = storageDoor2.getAttribute('storagedoor').isOpenS;
-      
-          storageDoor1.setAttribute('storagedoor', 'isOpenS', !isOpenS1);
-          storageDoor2.setAttribute('storagedoor', 'isOpenS', !isOpenS2);
-      
-          var animationDuration = 0;  
-          var easing = 'easeInOutQuad';  
-      
-          storageDoor1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenS1 ? '0 90 0' : '0 0 0'
-          });
-          storageDoor1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenS1 ? '-0.7869 2.32204 -0.47444' : '-1.30988 2.32204 0.06979'
-          });
-      
-          handle1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenS1 ? '0 90 0' : '0 0 0'
-          });
-          handle1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenS1 ? '-0.43765 2.32204 -0.44493' : '-1.33575 2.32204 0.5045'
-          });
-      
-          storageDoor2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenS2 ? '0 90 0' : '0 0 0'
-          });
-          storageDoor2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenS2 ? '0.41011 2.32204 -0.47444' : '1.00315 2.32204 0.12903'
-          });
-      
-          handle2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenS2 ? '0 90 0' : '0 0 0'
-          });
-          handle2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenS2 ? '0.02765 2.32204 -0.44493' : '1.04491 2.322 0.52845'
-          });
-      
-          var audioId = isOpenS1 || isOpenS2 ? 'storageOpen' : 'storageClose';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      // Small Storage doors
-      AFRAME.registerComponent('smallstoragedoor', {
-        schema: { isOpenSS: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoors.bind(this));
-        },
-        toggleDoors: function () {
-          var smallStorageDoor1 = document.getElementById('small-storage-door-1');
-          var smallStorageDoor2 = document.getElementById('small-storage-door-2');
-          var handle1 = document.getElementById('handle-small-storage-1');
-          var handle2 = document.getElementById('handle-small-storage-2');
-      
-          var isOpenSS1 = smallStorageDoor1.getAttribute('smallstoragedoor').isOpenSS;
-          var isOpenSS2 = smallStorageDoor2.getAttribute('smallstoragedoor').isOpenSS;
-
-          smallStorageDoor1.setAttribute('smallstoragedoor', 'isOpenSS', !isOpenSS1);
-          smallStorageDoor2.setAttribute('smallstoragedoor', 'isOpenSS', !isOpenSS2);
-
-          var animationDuration = 0;  
-          var easing = 'easeInOutQuad';  
-      
-          smallStorageDoor1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenSS1 ? '0 90 0' : '0 0 0'
-          });
-          smallStorageDoor1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenSS1 ? '-0.49617 3.43639 -1.36877' : '-0.76035 3.43263 -1.1184'
-          });
-      
-          handle1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenSS1 ? '0 0 0' : '0 90 0'
-          });
-          handle1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenSS1 ? '-0.08669 3.50788 -1.29269' : '-0.77454 3.50788 -0.91007'
-          });
-      
-          smallStorageDoor2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenSS2 ? '0 90 0' : '0 0 0'
-          });
-          smallStorageDoor2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenSS2 ? '0.03015 3.43639 -1.36877' : '0.28416 3.43639 -1.10795'
-          });
-      
-          handle2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenSS2 ? '0 0 0' : '0 90 0'
-          });
-          handle2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenSS2 ? '-0.38846 3.50788 -1.29269' : '0.29548 3.50788 -0.96703'
-          });
-      
-          var audioId = isOpenSS1 || isOpenSS2 ? 'drawerOpen' : 'drawerClose';
-          var audio = document.getElementById(audioId);
-
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });      
-
-      //Box 1
-      AFRAME.registerComponent('boxesdoor', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var boxesDoor = document.getElementById('boxes-door-1');
-          var handle = document.getElementById('handle-boxes-1');
-          var isOpenb1 = boxesDoor.getAttribute('boxesdoor').isOpenb1;
-      
-          boxesDoor.setAttribute('boxesdoor', 'isOpenb1', !isOpenb1);
-      
-          var animationDuration = 0;  
-          var easing = 'easeInOutQuad';  
-
-          boxesDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb1 ? '0 90 0' : '0 170 0'
-          });
-          boxesDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb1 ? '1.9548 1.10462 -0.91695' : '1.596 1.10462 -0.608'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb1 ? '90 90 0' : '90 170 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb1 ? '2.01904 1.43714 -0.88374' : '1.568 1.43714 -0.549'
-          });
-      
-          if (!boxesDoor.hasAttribute('raycaster')) {
-            boxesDoor.setAttribute('raycaster', 'objects: .collidable');
-          }
- 
-          var audioId = isOpenb1 ? 'drawerClose' : 'drawerOpen';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });      
-
-      // Box 2
-      AFRAME.registerComponent('boxesdoor2', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var boxesDoor = document.getElementById('boxes-door-2');
-          var handle = document.getElementById('handle-boxes-2');
-          var isOpenb2 = boxesDoor.getAttribute('boxesdoor2').isOpenb2;
-      
-          boxesDoor.setAttribute('boxesdoor2', 'isOpenb2', !isOpenb2);
-      
-          var animationDuration = 0;  
-          var easing = 'easeInOutQuad';  
-
-          boxesDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb2 ? '0 90 0' : '0 170 0'
-          });
-          boxesDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb2 ? '1.9548 2.24583 -0.90258' : '1.59602 2.246 -0.60841'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb2 ? '90 90 0' : '90 170 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb2 ? '2.01904 1.62829 -0.88374' : '1.56824 1.62829 -0.54871'
-          });
-      
-          var audioId = isOpenb2 ? 'drawerClose' : 'drawerOpen';
-          var audio = document.getElementById(audioId);
-
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      // Box 3
-      AFRAME.registerComponent('boxesdoor3', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var boxesDoor = document.getElementById('boxes-door-3');
-          var handle = document.getElementById('handle-boxes-3');
-          var isOpenb3 = boxesDoor.getAttribute('boxesdoor3').isOpenb3;
-      
-          // Toggle the door state
-          boxesDoor.setAttribute('boxesdoor3', 'isOpenb3', !isOpenb3);
-      
-          // Define animation properties
-          var animationDuration = 0; 
-          var easing = 'easeInOutQuad';  
-
-          // Update door properties based on the state with animation
-          boxesDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb3 ? '0 90 0' : '0 170 0'
-          });
-          boxesDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb3 ? '1.9548 3.26608 -0.9025' : '1.596 3.26608 -0.608'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb3 ? '90 90 0' : '90 170 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb3 ? '2.01904 3.04595 -0.88374' : '1.568 3.04595 -0.549'
-          });
-      
-          // Play the sound effect based on the state
-          var audioId = isOpenb3 ? 'drawerClose' : 'drawerOpen';
-          var audio = document.getElementById(audioId);
-      
-          // Check if the audio element is defined and is loaded
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            // If the audio is not loaded, wait for the 'loadeddata' event
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });      
-
-      // Box 4
-      AFRAME.registerComponent('boxesdoor4', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var boxesDoor = document.getElementById('boxes-door-4');
-          var handle = document.getElementById('handle-boxes-4');
-          var isOpenb4 = boxesDoor.getAttribute('boxesdoor4').isOpenb4;
-      
-          // Toggle the door state
-          boxesDoor.setAttribute('boxesdoor4', 'isOpenb4', !isOpenb4);
-      
-          // Define animation properties
-          var animationDuration = 0;  
-          var easing = 'easeInOutQuad';  
-      
-          // Update door properties based on the state with animation
-          boxesDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb4 ? '0 90 0' : '0 170 0'
-          });
-          boxesDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb4 ? '2.62905 2.96795 -0.917' : '2.22453 2.96795 -0.57238'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb4 ? '0 90 0' : '0 -10 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb4 ? '2.86394 2.64347 -0.88374' : '2.17656 2.64347 -0.38159'
-          });
-      
-          // Play the sound effect based on the state
-          var audioId = isOpenb4 ? 'drawerClose' : 'drawerOpen';
-          var audio = document.getElementById(audioId);
-      
-          // Check if the audio element is defined and is loaded
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            // If the audio is not loaded, wait for the 'loadeddata' event
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });      
-
-      // Box 5
-      AFRAME.registerComponent('boxesdoor5', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var boxesDoor = document.getElementById('boxes-door-5');
-          var handle = document.getElementById('handle-boxes-5');
-          var isOpenb5 = boxesDoor.getAttribute('boxesdoor5').isOpenb5;
-      
-          // Toggle the door state
-          boxesDoor.setAttribute('boxesdoor5', 'isOpenb5', !isOpenb5);
-      
-          // Define animation properties
-          var animationDuration = 0;  
-          var easing = 'easeInOutQuad';  
-      
-          // Update door properties based on the state with animation
-          boxesDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb5 ? '0 90 0' : '0 10 0'
-          });
-          boxesDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb5 ? '3.33715 2.79565 -0.917' : '3.71341 2.79565 -0.60342'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb5 ? '0 90 0' : '0 10 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb5 ? '3.0935 2.64347 -0.88374' : '3.75165 2.64347 -0.42411'
-          });
-      
-          // Check if raycasting components are present and update the collidable class
-          if (!boxesDoor.hasAttribute('raycaster')) {
-            boxesDoor.setAttribute('raycaster', 'objects: .collidable');
-          }
-      
-          // Play the sound effect based on the state
-          var audioId = isOpenb5 ? 'drawerClose' : 'drawerOpen';
-          var audio = document.getElementById(audioId);
-      
-          // Check if the audio element is defined and is loaded
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            // If the audio is not loaded, wait for the 'loadeddata' event
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      // Box 6
-      AFRAME.registerComponent('boxesdoor6', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var boxesDoor = document.getElementById('boxes-door-6');
-          var handle = document.getElementById('handle-boxes-6');
-          var isOpenb6 = boxesDoor.getAttribute('boxesdoor6').isOpenb6;
-      
-          // Toggle the door state
-          boxesDoor.setAttribute('boxesdoor6', 'isOpenb6', !isOpenb6);
-      
-          // Define animation properties
-          var animationDuration = 0;  
-          var easing = 'easeInOutQuad';  
-      
-          // Update door properties based on the state with animation
-          boxesDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb6 ? '0 90 0' : '0 0 0'
-          });
-          boxesDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb6 ? '4.0313 2.79565 -0.917' : '4.38493 2.79565 -0.58662'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb6 ? '0 90 0' : '0 90 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb6 ? '3.79911 2.64347 -0.88374' : '4.40576 2.64347 -0.88374'
-          });
-      
-          // Check if raycasting components are present and update the collidable class
-          if (!boxesDoor.hasAttribute('raycaster')) {
-            boxesDoor.setAttribute('raycaster', 'objects: .collidable');
-          }
-      
-          // Play the sound effect based on the state
-          var audioId = isOpenb6 ? 'drawerClose' : 'drawerOpen';
-          var audio = document.getElementById(audioId);
-      
-          // Check if the audio element is defined and is loaded
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            // If the audio is not loaded, wait for the 'loadeddata' event
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      // Box 7
-      AFRAME.registerComponent('boxesdoor7', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var boxesDoor = document.getElementById('boxes-door-7');
-          var handle = document.getElementById('handle-boxes-7');
-          var isOpenb7 = boxesDoor.getAttribute('boxesdoor7').isOpenb7;
-      
-          // Toggle the door state
-          boxesDoor.setAttribute('boxesdoor7', 'isOpenb7', !isOpenb7);
-      
-          // Define animation properties
-          var animationDuration = 500;  
-          var easing = 'easeInOutQuad';  
-      
-          // Update door properties based on the state with animation
-          boxesDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb7 ? '0 0 0' : '0 0 0'
-          });
-          boxesDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb7 ? '3.69441 1.0734 -0.36638' : '3.694 1.073 -1.25966'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb7 ? '0 0 0' : '0 0 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb7 ? '3.67654 1.08804 -0.00156' : '3.67654 1.08804 -0.86773'
-          });
-      
-          var audioId = isOpenb7 ? 'drawerClose' : 'drawerOpen';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });      
-
-      // Box 8
-      AFRAME.registerComponent('boxesdoor8', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var boxesDoor = document.getElementById('boxes-door-8');
-          var handle = document.getElementById('handle-boxes-8');
-          var isOpenb8 = boxesDoor.getAttribute('boxesdoor8').isOpenb8;
-      
-          // Toggle the door state
-          boxesDoor.setAttribute('boxesdoor8', 'isOpenb8', !isOpenb8);
-      
-          // Define animation properties
-          var animationDuration = 500;  
-          var easing = 'easeInOutQuad';  
-      
-          // Update door properties based on the state with animation
-          boxesDoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb8 ? '0 0 0' : '0 100 0'
-          });
-          boxesDoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb8 ? '3.69441 1.0734 1.81199' : '3.4434 1.073 2.12672'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb8 ? '0 0 0' : '0 100 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenb8 ? '3.67654 1.08804 1.63343' : '3.30317 1.08804 2.15208'
-          });
-      
-          // Check if raycasting components are present and update the collidable class
-          if (!boxesDoor.hasAttribute('raycaster')) {
-            boxesDoor.setAttribute('raycaster', 'objects: .collidable');
-          }
-      
-          // Play the sound effect based on the state
-          var audioId = isOpenb8 ? 'drawerClose' : 'drawerOpen';
-          var audio = document.getElementById(audioId);
-      
-          // Check if the audio element is defined and is loaded
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            // If the audio is not loaded, wait for the 'loadeddata' event
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //Tv and Ps5
-      document.addEventListener('DOMContentLoaded', function () {
-        const HIDDEN_SCALE = '0 0 0';
-
-        class VideoController {
-          constructor(videoEntity, speakerEntity1, speakerEntity2, otherController) {
-            this.videoEntity = videoEntity;
-            this.speakerEntity1 = speakerEntity1;
-            this.speakerEntity2 = speakerEntity2;
-            this.isVideoPlaying = false;
-            this.otherController = otherController;
-          }
-
-          toggleVideo() {
-            if (this.isVideoPlaying) {
-              this.pauseAndHideVideo();
-            } else {
-              // Pause the other video before playing this one
-              if (this.otherController.isVideoPlaying) {
-                this.otherController.pauseAndHideVideo();
-              }
-              this.playVideo();
-            }
-            this.isVideoPlaying = !this.isVideoPlaying;
-          }
-
-          pauseAndHideVideo() {
-            this.pauseVideo();
-            this.hideVideoBox();
-            this.resetSpeakerAnimation();
-          }
-
-          pauseVideo() {
-            this.videoEntity.components.material.material.map.image.pause();
-            this.resetSpeakerAnimation();
-          }
-
-          playVideo() {
-            this.videoEntity.components.material.material.map.image.play();
-            this.startSpeakerAnimations();
-            this.showVideoBox();
-          }
-
-          hideVideoBox() {
-            this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
-          }
-
-          showVideoBox() {
-            this.videoEntity.setAttribute('scale', '1 1 1');
-          }
-
-          resetSpeakerAnimation() {
-            this.speakerEntity1.removeAttribute('animation__scale');
-            this.speakerEntity2.removeAttribute('animation__scale');
-          }
-
-          startSpeakerAnimations() {
-            this.speakerEntity1.setAttribute('animation__scale', "property: scale; to: 1.2 1.2 1.2; easing: easeInOutQuad; dur: 500; loop: true");
-            this.speakerEntity2.setAttribute('animation__scale', "property: scale; to: 1.2 1.2 1.2; easing: easeInOutQuad; dur: 500; loop: true");
-          }
-        }
-
-        const tvVideoController = new VideoController(
-          document.getElementById('tvVideo'),
-          document.getElementById('speaker1'),
-          document.getElementById('speaker2'),
-          null
-        );
-
-        const ps5VideoController = new VideoController(
-          document.getElementById('ps5Video'),
-          document.getElementById('speaker1'),
-          document.getElementById('speaker2'),
-          tvVideoController
-        );
-
-        // Set the other controller for each instance
-        tvVideoController.otherController = ps5VideoController;
-
-        document.getElementById('tvScreen').addEventListener('click', () => tvVideoController.toggleVideo());
-        document.getElementById('ps5Entity').addEventListener('click', () => ps5VideoController.toggleVideo());
-      });
-
-      //Sink
-      AFRAME.registerComponent('bathroomsink', {
-        init: function () {
-          var el = this.el;
-          var waterEntities = document.querySelectorAll('#water1, #water2');
-          var isWaterVisible = false;
-
-          el.addEventListener('click', function () {
-            isWaterVisible = !isWaterVisible;
-
-            if (isWaterVisible) {
-              // Show water by setting the scale
-              waterEntities.forEach(function (entity) {
-                entity.setAttribute('scale', '1 1 1');
-              });
-
-              // Start audio playback
-              el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
-            } else {
-              // Hide water by setting the scale to 0
-              waterEntities.forEach(function (entity) {
-                entity.setAttribute('scale', '0 0 0');
-              });
-
-              // Stop audio playback
-              el.removeAttribute('sound');
-            }
-          });
-        },
-      });
-
-      //Shower
-      AFRAME.registerComponent('shower', {
-        init: function () {
-          var el = this.el;
-          var showerWater = document.getElementById('shower-water');
-          var showerAudio = document.getElementById('showerAudio');
-          var isWaterVisible = false;
-
-          el.addEventListener('click', function () {
-            isWaterVisible = !isWaterVisible;
-
-            if (isWaterVisible) {
-              showerWater.setAttribute('scale', '1 1 1.2');
-
-              showerAudio.play();
-            } else {
-              showerWater.setAttribute('scale', '0 0 0');
-
-              showerAudio.pause();
-              showerAudio.currentTime = 0; 
-            }
-          });
-        },
-      });
-
-      //pool shower 
-      AFRAME.registerComponent('pool-shower', {
-        init: function () {
-          var el = this.el;
-          var showerWater = document.getElementById('shower-water-2');
-          var showerAudio = document.getElementById('showerAudio');
-          var isWaterVisible = false;
-
-          el.addEventListener('click', function () {
-            isWaterVisible = !isWaterVisible;
-
-            if (isWaterVisible) {
-              // Show water by setting the scale
-              showerWater.setAttribute('scale', '1 1 1.2');
-
-              // Start audio playback
-              showerAudio.play();
-            } else {
-              // Hide water by setting the scale to 0
-              showerWater.setAttribute('scale', '0 0 0');
-
-              // Stop audio playback
-              showerAudio.pause();
-              showerAudio.currentTime = 0; // Reset the audio to the beginning
-            }
-          });
-        },
-      });
-
-      //Kitchen Sink
-      AFRAME.registerComponent('kitchensink', {
-        init: function () {
-          var el = this.el;
-          var waterEntities = document.querySelectorAll('#water2-1, #water2-2');
-          var isWaterVisible = false;
-
-          el.addEventListener('click', function () {
-            isWaterVisible = !isWaterVisible;
-
-            if (isWaterVisible) {
-              // Show water by setting the scale
-              waterEntities.forEach(function (entity) {
-                entity.setAttribute('scale', '1 1 1');
-              });
-
-              // Start audio playback
-              el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
-            } else {
-              // Hide water by setting the scale to 0
-              waterEntities.forEach(function (entity) {
-                entity.setAttribute('scale', '0 0 0');
-              });
-
-              // Stop audio playback
-              el.removeAttribute('sound');
-            }
-          });
-        },
-      });
-
-      //Gas Stove 
-      AFRAME.registerComponent('stove', {
-
-        init: function () {
-          var el = this.el;
-          var waterEntities = document.querySelectorAll('#gas-stove, #gas-stove-2, #gas-stove-3, #gas-stove-4');
-          var isWaterVisible = false;
-
-          el.addEventListener('click', function () {
-            isWaterVisible = !isWaterVisible;
-
-            if (isWaterVisible) {
-              // Show water by setting the scale
-              waterEntities.forEach(function (entity) {
-                entity.setAttribute('scale', '1 1 1');
-              });
-
-              // Start audio playback
-              el.setAttribute('sound', 'src: #gasAudio; autoplay: true; loop: true');
-            } else {
-              // Hide water by setting the scale to 0
-              waterEntities.forEach(function (entity) {
-                entity.setAttribute('scale', '0 0 0');
-              });
-
-              // Stop audio playback
-              el.removeAttribute('sound');
-            }
-          });
-        },
-      });
-
-      //Teleportation 
-      AFRAME.registerComponent('teleportation-up', {
-        init: function () {
-          this.el.addEventListener('click', this.teleport.bind(this, '-0.474 6.3 4.188', '1.444 -268.488 0'));
-        },
-        teleport: function (position, rotation) {
-          var camera = document.getElementById('cameraRig');
-          var audio = document.getElementById('teleport');
-      
-          if (camera) {
-            camera.setAttribute('position', position);
-            camera.setAttribute('rotation', rotation);
-          }
-      
-          if (audio) {
-            audio.play();
-          }
-        }
-      });
-      
-      // Teleportation down 
-      AFRAME.registerComponent('teleportation-down', {
-        init: function () {
-          this.el.addEventListener('click', this.teleport.bind(this, '-4.694 2.200 5.603', '-1.192 544.195 0'));
-        },
-        teleport: function (position, rotation) {
-          var camera = document.getElementById('cameraRig');
-          var audio = document.getElementById('teleport');
-      
-          if (camera) {
-            camera.setAttribute('position', position);
-            camera.setAttribute('rotation', rotation);
-          }
-      
-          if (audio) {
-            audio.play();
-          }
-        }
-      });
-      
-      //Bed door 1 
-      AFRAME.registerComponent('bedroomdoor', {
-        schema: { isOpenBedroom1: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var bedroomdoor = document.getElementById('bedroomdoor-1');
-          var isOpenBedroom1 = bedroomdoor.getAttribute('bedroomdoor').isOpenBedroom1;
-
-          bedroomdoor.setAttribute('bedroomdoor', 'isOpenBedroom1', !isOpenBedroom1);
-
-          var animationDuration = 500;  
-          var easing = 'easeInOutQuad';  
-
-          bedroomdoor.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenBedroom1 ? '0 0 0' : '0 -90 0'
-          });
-          bedroomdoor.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenBedroom1 ? '0.3798 4.10988 1.38675' : '0.895 4.09 2.03074'
-          });
-      
-          var audioId = isOpenBedroom1 ? 'closeDoorAudio' : 'openDoorAudio';
-          var audio = document.getElementById(audioId);
-
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //Bathroom door 2
-      AFRAME.registerComponent('bathroomdoor2', {
-        schema: { isOpenBathroom2: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var bathroomdoor2 = document.getElementById('bathroomdoor-2');
-          var isOpenBathroom2 = bathroomdoor2.getAttribute('bathroomdoor2').isOpenBathroom2;
-
-          bathroomdoor2.setAttribute('bathroomdoor2', 'isOpenBathroom2', !isOpenBathroom2);
-
-          var animationDuration = 500;  
-          var easing = 'easeInOutQuad';  
-
-          bathroomdoor2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenBathroom2 ? '0 90 0' : '0 180 0'
-          });
-          bathroomdoor2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenBathroom2 ? '0.935 4.10988 2.72942' : '1.42887 4.10988 3.157'
-          });
-
-          var audioId = isOpenBathroom2 ? 'closeDoorAudio' : 'openDoorAudio';
-          var audio = document.getElementById(audioId);
-
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //Storage door
-      AFRAME.registerComponent('storagedoor2', {
-        schema: { isStoragedoor: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-          var storagedoor2 = document.getElementById('storagedoorsingle-1');
-          var isStoragedoor = storagedoor2.getAttribute('storagedoor2').isStoragedoor;
-
-          storagedoor2.setAttribute('storagedoor2', 'isStoragedoor', !isStoragedoor);
-
-          var animationDuration = 500;  
-          var easing = 'easeInOutQuad';  
-      
-          storagedoor2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isStoragedoor ? '0 0 0' : '0 90 0'
-          });
-          storagedoor2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isStoragedoor ? '0.3798 4.10988 8.55605' : '-0.16798 4.10988 9.16804'
-          });
-
-          var audioId = isStoragedoor ? 'closeDoorAudio' : 'openDoorAudio';
-          var audio = document.getElementById(audioId);
-
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //bedroom door2
-      AFRAME.registerComponent('bedroomdoor2', {
-        schema: { isBedroomdoor2: { default: false } },
-        init: function () {
-            this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-            var bedroomdoor2 = this.el;
-            var isBedroomdoor2 = bedroomdoor2.getAttribute('bedroomdoor2').isBedroomdoor2;
-    
-            bedroomdoor2.setAttribute('bedroomdoor2', 'isBedroomdoor2', !isBedroomdoor2);
-    
-            var animationDuration = 500;
-            var easing = 'easeInOutQuad';
-    
-            bedroomdoor2.setAttribute('animation__rotation', {
-                property: 'rotation',
-                dur: animationDuration,
-                easing: easing,
-                to: isBedroomdoor2 ? '0 180 0' : '0 270 0'
-            });
-            bedroomdoor2.setAttribute('animation__position', {
-                property: 'position',
-                dur: animationDuration,
-                easing: easing,
-                to: isBedroomdoor2 ? '-10.56676 4.156 8.81517' : '-10.53738 4.156 8.78994'
-            });
-    
-            var audioId = isBedroomdoor2 ? 'closeDoorAudio' : 'openDoorAudio';
-            var audio = document.getElementById(audioId);
-    
-            if (audio && audio.readyState >= 2) {
-                audio.play();
-            } else {
-                audio.addEventListener('loadeddata', function () {
-                    audio.play();
-                });
-            }
-        }
-      });    
-    
-      //Bathroom door 3 
-      AFRAME.registerComponent('bathroomdoor3', {
-        schema: { isBathroomdoor3: { default: false } },
-        init: function () {
-            this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-            var bathroomdoor3 = this.el;
-            var isBathroomdoor3 = bathroomdoor3.getAttribute('bathroomdoor3').isBathroomdoor3;
-    
-            bathroomdoor3.setAttribute('bathroomdoor3', 'isBathroomdoor3', !isBathroomdoor3);
-    
-            var animationDuration = 500;
-            var easing = 'easeInOutQuad';
-    
-            bathroomdoor3.setAttribute('animation__rotation', {
-                property: 'rotation',
-                dur: animationDuration,
-                easing: easing,
-                to: isBathroomdoor3 ? '0 180 0' : '0 90 0'
-            });
-            bathroomdoor3.setAttribute('animation__position', {
-                property: 'position',
-                dur: animationDuration,
-                easing: easing,
-                to: isBathroomdoor3 ? '-7.98797 4.156 8.81517' : '-7.99823 4.156 8.91641'
-            });
-    
-            var audioId = isBathroomdoor3 ? 'closeDoorAudio' : 'openDoorAudio';
-            var audio = document.getElementById(audioId);
-    
-            if (audio && audio.readyState >= 2) {
-                audio.play();
-            } else {
-                audio.addEventListener('loadeddata', function () {
-                    audio.play();
-                });
-            }
-        }
-      });    
-
-      //Workroom door
-      AFRAME.registerComponent('workroom', {
-        schema: { isWorkroomdoor: { default: false } },
-        init: function () {
-            this.el.addEventListener('click', this.toggleDoor.bind(this));
-        },
-        toggleDoor: function () {
-            var workroomdoor = this.el;
-            var isWorkroomdoor = workroomdoor.getAttribute('workroom').isWorkroomdoor;
-    
-            workroomdoor.setAttribute('workroom', 'isWorkroomdoor', !isWorkroomdoor);
-    
-            var animationDuration = 500;
-            var easing = 'easeInOutQuad';
-    
-            workroomdoor.setAttribute('animation__rotation', {
-                property: 'rotation',
-                dur: animationDuration,
-                easing: easing,
-                to: isWorkroomdoor ? '0 180 0' : '0 270 0'
-            });
-            workroomdoor.setAttribute('animation__position', {
-                property: 'position',
-                dur: animationDuration,
-                easing: easing,
-                to: isWorkroomdoor ? '-4.28127 4.156 8.81517' : '-4.23575 4.156 8.76495'
-            });
-    
-            var audioId = isWorkroomdoor ? 'closeDoorAudio' : 'openDoorAudio';
-            var audio = document.getElementById(audioId);
-    
-            if (audio && audio.readyState >= 2) {
-                audio.play();
-            } else {
-                audio.addEventListener('loadeddata', function () {
-                    audio.play();
-                });
-            }
-        }
-      });
-    
-      //shower3
-      AFRAME.registerComponent('shower2', {
-        init: function () {
-          var el = this.el;
-          var showerWater = document.getElementById('shower-water-3');
-          var showerAudio = document.getElementById('showerAudio');
-          var isWaterVisible = false;
-
-          el.addEventListener('click', function () {
-            isWaterVisible = !isWaterVisible;
-
-            if (isWaterVisible) {
-              showerWater.setAttribute('scale', '1 1 1.2');
-
-              showerAudio.play();
-            } else {
-              showerWater.setAttribute('scale', '0 0 0');
-
-              showerAudio.pause();
-              showerAudio.currentTime = 0; 
-            }
-          });
-        },
-      });
-      
-      //shower4
-      AFRAME.registerComponent('shower3', {
-        init: function () {
-          var el = this.el;
-          var showerWater = document.getElementById('shower-water-4');
-          var showerAudio = document.getElementById('showerAudio');
-          var isWaterVisible = false;
-
-          el.addEventListener('click', function () {
-            isWaterVisible = !isWaterVisible;
-
-            if (isWaterVisible) {
-              showerWater.setAttribute('scale', '1 1 1.2');
-
-              showerAudio.play();
-            } else {
-              showerWater.setAttribute('scale', '0 0 0');
-
-              showerAudio.pause();
-              showerAudio.currentTime = 0; 
-            }
-          });
-        },
-      });
-      
-      //bathroom Sink 2
-      AFRAME.registerComponent('bathroomsink2', {
-        init: function () {
-          var el = this.el;
-          var waterEntities = document.querySelectorAll('#water2-4, #water2-3');
-          var isWaterVisible = false;
-
-          el.addEventListener('click', function () {
-            isWaterVisible = !isWaterVisible;
-
-            if (isWaterVisible) {
-              // Show water by setting the scale
-              waterEntities.forEach(function (entity) {
-                entity.setAttribute('scale', '1 1 1');
-              });
-
-              // Start audio playback
-              el.setAttribute('sound', 'src: #sinkAudio; autoplay: true; loop: true');
-            } else {
-              // Hide water by setting the scale to 0
-              waterEntities.forEach(function (entity) {
-                entity.setAttribute('scale', '0 0 0');
-              });
-
-              el.removeAttribute('sound');
-            }
-          });
-        },
-      });
-
-      //Tv2
-      document.addEventListener('DOMContentLoaded', function () {
-        const HIDDEN_SCALE = '0 0 0';
-    
-        class VideoController {
-            constructor(videoEntity) {
-                this.videoEntity = videoEntity;
-                this.isVideoPlaying = false;
-            }
-    
-            toggleVideo() {
-                if (this.isVideoPlaying) {
-                    this.pauseAndHideVideo();
-                } else {
-                    this.playVideo();
-                }
-                this.isVideoPlaying = !this.isVideoPlaying;
-            }
-    
-            pauseAndHideVideo() {
-                this.pauseVideo();
-                this.hideVideoBox();
-            }
-    
-            pauseVideo() {
-                this.videoEntity.components.material.material.map.image.pause();
-            }
-    
-            playVideo() {
-                this.videoEntity.components.material.material.map.image.play();
-                this.showVideoBox();
-            }
-    
-            hideVideoBox() {
-                this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
-            }
-    
-            showVideoBox() {
-                this.videoEntity.setAttribute('scale', '1 1 1');
-            }
-        }
-    
-        const tvVideoController2 = new VideoController(
-            document.getElementById('tvVideo2')
-        );
-    
-        document.getElementById('tvScreen2').addEventListener('click', () => tvVideoController2.toggleVideo());
-    });
-
-      //Tv3
-      document.addEventListener('DOMContentLoaded', function () {
-        const HIDDEN_SCALE = '0 0 0';
-    
-        class VideoController {
-            constructor(videoEntity) {
-                this.videoEntity = videoEntity;
-                this.isVideoPlaying = false;
-            }
-    
-            toggleVideo() {
-                if (this.isVideoPlaying) {
-                    this.pauseAndHideVideo();
-                } else {
-                    this.playVideo();
-                }
-                this.isVideoPlaying = !this.isVideoPlaying;
-            }
-    
-            pauseAndHideVideo() {
-                this.pauseVideo();
-                this.hideVideoBox();
-            }
-    
-            pauseVideo() {
-                this.videoEntity.components.material.material.map.image.pause();
-            }
-    
-            playVideo() {
-                this.videoEntity.components.material.material.map.image.play();
-                this.showVideoBox();
-            }
-    
-            hideVideoBox() {
-                this.videoEntity.setAttribute('scale', HIDDEN_SCALE);
-            }
-    
-            showVideoBox() {
-                this.videoEntity.setAttribute('scale', '1 1 1');
-            }
-        }
-    
-        const tvVideoController3 = new VideoController(
-            document.getElementById('tvVideo3')
-        );
-    
-        document.getElementById('tvScreen3').addEventListener('click', () => tvVideoController3.toggleVideo());
-    });    
-      
-      //Bedroom drawer 
-      AFRAME.registerComponent('drawer', {
-        schema: { isOpen: { default: false } },
-        init: function () {
-          this.el.addEventListener('click', this.toggleDrawer.bind(this));
-        },
-        toggleDrawer: function () {
-          var drawerDoor1 = document.getElementById('bedroom-drawerdoor-1');
-          var drawerDoor2 = document.getElementById('bedroom-drawerdoor-2');
-          var handle1 = document.getElementById('bedroom-drawerhandle-1');
-          var handle2 = document.getElementById('bedroom-drawerhandle-2');
-      
-          var isOpen1 = drawerDoor1.getAttribute('drawer').isOpen;
-          var isOpen2 = drawerDoor2.getAttribute('drawer').isOpen;
-      
-          drawerDoor1.setAttribute('drawer', 'isOpen', !isOpen1);
-          drawerDoor2.setAttribute('drawer', 'isOpen', !isOpen2);
-      
-          var animationDuration = 0;
-          var easing = 'easeInOutQuad';
-      
-          drawerDoor1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen1 ? '0 90 0' : '0 0 0'
-          });
-          drawerDoor1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen1 ? '-10.67799 6.16619 14.81062' : '-10.37309 6.16619 14.48496'
-          });
-      
-          handle1.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen1 ? '0 90 0' : '0 0 0'
-          });
-          handle1.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen1 ? '-10.85146 6.0617 14.76944' : '-10.32767 6.0617 14.76944'
-          });
-      
-          drawerDoor2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen2 ? '0 90 0' : '0 180 0'
-          });
-          drawerDoor2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen2 ? '-11.30407 6.16619 14.81062' : '-11.59647 6.16619 14.485'
-          });
-      
-          handle2.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen2 ? '0 90 0' : '0 180 0'
-          });
-          handle2.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpen2 ? '-11.15203 6.0617 14.76944' : '-11.61043 6.14433 14.3187'
-          });
-
-          var audioId = isOpen1 || isOpen2 ? 'drawerOpen' : 'drawerClose';
-          var audio = document.getElementById(audioId);
-
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //waredrobe 1
-      AFRAME.registerComponent('waredrobe1', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleWardrobe.bind(this));
-        },
-        toggleWardrobe: function () {
-          var wardrobe = document.getElementById('waredrobe-1');
-          var handle = document.getElementById('waredrobe-handle-1');
-          var isOpenW1 = wardrobe.getAttribute('waredrobe1').isOpenW1;
-      
-          wardrobe.setAttribute('waredrobe1', 'isOpenW1', !isOpenW1);
-      
-          var animationDuration = 0;
-          var easing = 'easeInOutQuad';
-      
-          wardrobe.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW1 ? '0 90 0' : '0 0 0'
-          });
-          wardrobe.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW1 ? '2.04402 5.62826 6.08177' : '2.36575 5.62826 5.74016' 
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW1 ? '0 90 0' : '0 0 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW1 ? '1.89459 5.24249 6.06963' : '2.40826 5.24249 6.06963'
-          });
-      
-          var audioId = isOpenW1 ? 'drawerOpen' : 'drawerClose';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //waredrobe 2
-      AFRAME.registerComponent('waredrobe2', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleWardrobe.bind(this));
-        },
-        toggleWardrobe: function () {
-          var wardrobe = document.getElementById('waredrobe-2');
-          var handle = document.getElementById('waredrobe-handle-2');
-          var isOpenW2 = wardrobe.getAttribute('waredrobe2').isOpenW2;
-      
-          wardrobe.setAttribute('waredrobe2', 'isOpenW2', !isOpenW2);
-      
-          var animationDuration = 0;
-          var easing = 'easeInOutQuad';
-      
-          wardrobe.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW2 ? '0 90 0' : '0 0 0'
-          });
-          wardrobe.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW2 ? '1.4411 5.38949 6.08177' : '1.71318 5.38949 5.80648'
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW2 ? '0 90 0' : '0 0 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW2 ? '1.26638 5.24249 6.06963' : '1.72692 5.24249 5.62909' 
-          });
-      
-          var audioId = isOpenW2 ? 'drawerOpen' : 'drawerClose';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-      //waredrobe 3
-      AFRAME.registerComponent('waredrobe3', {
-        init: function () {
-          this.el.addEventListener('click', this.toggleWardrobe.bind(this));
-        },
-        toggleWardrobe: function () {
-          var wardrobe = document.getElementById('waredrobe-3');
-          var handle = document.getElementById('waredrobe-handle-3');
-          var isOpenW3 = wardrobe.getAttribute('waredrobe3').isOpenW3;
-      
-          wardrobe.setAttribute('waredrobe3', 'isOpenW3', !isOpenW3);
-      
-          var animationDuration = 0;
-          var easing = 'easeInOutQuad';
-      
-          wardrobe.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW3 ? '0 90 0' : '0 0 0'
-          });
-          wardrobe.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW3 ? '0.80723 5.1383 6.08177' : '0.47328 5.1383 5.71895' 
-          });
-      
-          handle.setAttribute('animation__rotation', {
-            property: 'rotation',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW3 ? '0 90 0' : '0 0 0'
-          });
-          handle.setAttribute('animation__position', {
-            property: 'position',
-            dur: animationDuration,
-            easing: easing,
-            to: isOpenW3 ? '1.02716 5.24249 6.06963' : '0.45464 5.24249 5.56757'
-          });
-      
-          var audioId = isOpenW3 ? 'drawerOpen' : 'drawerClose';
-          var audio = document.getElementById(audioId);
-      
-          if (audio && audio.readyState >= 2) {
-            audio.play();
-          } else {
-            audio.addEventListener('loadeddata', function () {
-              audio.play();
-            });
-          }
-        }
-      });
-      
-    </script>
-    <!---===========================================================================JS end=========================================================================-->
-
-
+    <!--Light-->
+    <a-light id="pointLight1" type="directional" position="-7.43723 7.551 3.3548" target="#ground" castshadow="true"
+      light="type: point; angle: 0; groundColor: #DDD; distance: 10; intensity: 1.5"></a-light>
+    <a-light id="ambientLight" type="directional" position="0.83662 3.77938 6.24746" target="#ground" castshadow="true"
+      light="type: ambient; angle: 0; distance: 10; intensity: 0.15; groundColor: #DDD"></a-light>
+    <a-light id="pointLight2" type="directional" position="3.94769 2.22214 -3.70152" target="#ground" castshadow="true"
+      light="type: point; angle: 0; distance: 5; intensity: 0.15; groundColor: #DDD"></a-light>
+    <a-light id="pointLight3" type="directional" position="1.36912 7.551 6.11548" target="#ground" castshadow="true"
+      light="type: point; angle: 0; distance: 8; intensity: 1; groundColor: #DDD"></a-light>
+    <a-light id="pointLight4" type="directional" position="2.29852 7.551 0.16415" target="#ground" castshadow="true"
+      light="type: point; angle: 0; distance: 5; intensity: 2; groundColor: #DDD"></a-light>
+    <a-light id="pointLight5" type="directional" position="-12.60407 7.551 3.37206" target="#ground" castshadow="true"
+      light="type: point; angle: 0; distance: 10; intensity: 1.5; groundColor: #DDD"></a-light>
+    <a-light id="pointLight6" type="directional" position="-8.08393 7.551 12.52744" target="#ground" castshadow="true"
+      light="type: point; angle: 0; distance: 12; intensity: 2; groundColor: #DDD"></a-light>
+    <a-light id="pointLight7" type="directional" position="-14.45361 7.551 12.92398" target="#ground" castshadow="true"
+      light="type: point; angle: 0; distance: 10; intensity: 2; groundColor: #DDD"></a-light>
+    <a-light id="pointLight8" type="directional" position="1.79549 3.52072 6.20191" target="#ground" castshadow="true"
+      light="type: point; angle: 0; distance: 10; intensity: 2; groundColor: #DDD"></a-light>
+
+    <!--Switch-->
+    <a-entity  static-body="" geometry="depth: 2.5; height: 3.5; width: 0.15" position="-4.37911 2.315 8.795" material="src: images/stone-wall.jpg"></a-entity>
+    <a-entity class="intersectable" static-body geometry="depth: 0.2; height: 0.3; width: 0.1"
+      position="-4.48962 2.325 8.08448" material="src: images/stone-wall.jpg" scale="1 1 " rotation=""
+      switch-light ></a-entity>
+    <a-entity  static-body="" geometry="depth: 0.05; height: 0.1; width: 0.1"
+      position="-4.52221 2.325 8.09061" color="red" scale="" rotation="" ></a-entity>
+    <a-text id="SwitchText" align="center" color="#FFF" position="-4.65951 1.92819 8.13978" rotation="0 270 0"
+      text="width: 3; color: #d92641; value: Light switch (OFF)"></a-text>
+
+    <!--==================================================================================================================================================================================-->
     <!-- Tiny Walls -->
     <a-entity class="intersectable" static-body="" geometry="depth: 10; height: 1.22; width: 0.06"
       position="2.18705 0.94 -5.656" material="src: images/tiny-wall.jpg; repeat: 4 1" rotation="0 90 0"></a-entity>
@@ -2538,15 +2677,81 @@
       material="src: images/dark-texture.jpg" rotation="0 90 90" scale="1 1 1.2" class="intersectable"></a-entity>
     <!--Lamp-->
     <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-2.31223 0.51971 -2.45745" scale="0.2 0.2 0.2"
-      rotation="0 180 0"></a-entity>
+      rotation="0 180 0" material="color: #FFFFFF; emissive: #000000; emissiveIntensity: 1"></a-entity>
     <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-14.8236 0.51971 -2.45745" scale="0.2 0.2 0.2"
-      rotation="0 180 0"></a-entity>
+      rotation="0 180 0" material="color: #FFFFFF; emissive: #000000; emissiveIntensity: 1"></a-entity>
     <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-17.68255 0.51971 14.0629" scale="0.2 0.2 0.2"
-      rotation="0 180 0"></a-entity>
+      rotation="0 180 0" material="color: #FFFFFF; emissive: #000000; emissiveIntensity: 1"></a-entity>
     <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="6.35653 0.51971 -1.83939" scale="0.2 0.2 0.2"
-      rotation="0 180 0"></a-entity>
+      rotation="0 180 0" material="color: #FFFFFF; emissive: #000000; emissiveIntensity: 1"></a-entity>
     <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="6.35653 0.51971 14.11911" scale="0.2 0.2 0.2"
-      rotation="0 180 0"></a-entity>
+      rotation="0 180 0" material="color: #FFFFFF; emissive: #000000; emissiveIntensity: 1"></a-entity>
+
+
+    <!--ceilling light-->
+    <a-entity gltf-model="#ceillinglamp" position="-14.42685 6.43534 -2.463" scale="" rotation="0 180 0"
+      material="color: #FFFFFF; emissive: #000000"></a-entity>
+    <a-entity geometry="primitive: sphere; radius: 0.23"
+      material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2"
+      position="-14.42659 5.81588 -2.463" rotation="0 90 0"></a-entity>
+    <a-light type="directional" position="-13.58478 5.72778 -2.444" target="#ground" castshadow="true"
+      light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 7; decay: 2; intensity: 5"></a-light>
+
+    <a-entity gltf-model="#ceillinglamp" position="-7.05924 6.43534 -2.463" scale="" rotation="0 180 0"
+      material="color: #FFFFFF; emissive: #000000"></a-entity>
+    <a-entity geometry="primitive: sphere; radius: 0.23"
+      material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2"
+      position="-7.05442 5.81588 -2.463" rotation="0 90 0"></a-entity>
+    <a-light type="directional" position="-7.04696 5.72778 -2.444" target="#ground" castshadow="true"
+      light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 7; decay: 2; intensity: 5"></a-light>
+
+    <a-entity gltf-model="#ceillinglamp" position="1.36739 6.43534 13.61041" scale="" rotation="0 180 0"
+      material="color: #FFFFFF; emissive: #000000"></a-entity>
+    <a-entity geometry="primitive: sphere; radius: 0.23"
+      material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2"
+      position="1.35538 5.85057 13.62233" rotation="0 90.00021045914971 46.57287437720896"></a-entity>
+    <a-light type="directional" position="1.39533 5.82954 13.59454" target="#ground" castshadow="true"
+      light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 4; decay: 2; intensity: 4"
+      rotation="-10.558466248670811 -165.37739207097056 -172.38924956778158"></a-light>
+
+    <!--Lamp light-->
+    <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-14.8236 0.51971 -2.45745" scale="0.2 0.2 0.2"
+      rotation="0 180 0" material="color: #FFFFFF; emissive: #000000"></a-entity>
+    <a-entity geometry="primitive: sphere; radius: 0.23"
+      material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2"
+      position="-14.427 2.447 -2.463" rotation="0 90 0"></a-entity>
+    <a-light type="directional" position="-14.39414 2.36 -2.444" target="#ground" castshadow="true"
+      light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 7; decay: 2; intensity: 5"></a-light>
+
+    <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="-2.31223 0.51971 -2.45745" scale="0.2 0.2 0.2"
+      rotation="0 180 0" material="color: #FFFFFF; emissive: #000000"></a-entity>
+    <a-entity geometry="primitive: sphere; radius: 0.23"
+      material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2"
+      position="-1.91236 2.447 -2.463" rotation="0 90 0"></a-entity>
+    <a-light type="directional" position="-1.88947 2.36 -2.444" target="#ground" castshadow="true"
+      light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 2; decay: 2; intensity: 4"></a-light>
+
+    <a-entity obj-model="obj: #lamp; mtl: #lamp-material" position="6.35653 0.51971 -1.83939" scale="0.2 0.2 0.2"
+      rotation="0 180 0" material="color: #FFFFFF; emissive: #000000"></a-entity>
+    <a-entity geometry="primitive: sphere; radius: 0.23"
+      material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2"
+      position="6.739 2.447 -1.82984" rotation="0 90 0"></a-entity>
+    <a-light type="directional" position="6.72137 2.36 14.07367" target="#ground" castshadow="true"
+      light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 3; decay: 2; intensity: 5"></a-light>
+
+    <a-light type="directional" position="6.72137 2.36 -1.8535" target="#ground" castshadow="true"
+      light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 3; decay: 2; intensity: 4"></a-light>
+    <a-entity geometry="primitive: sphere; radius: 0.23"
+      material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2"
+      position="6.74535 2.447 14.11672" rotation="0 90 0"></a-entity>
+
+    <a-entity geometry="primitive: sphere; radius: 0.23"
+      material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2"
+      position="-17.29779 2.447 14.05999" rotation="0 90 0"></a-entity>
+    <a-light type="directional" position="-17.26472 2.36 14.02638" target="#ground" castshadow="true"
+      light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 5; decay: 2; intensity: 4"
+      scale="0.00001 0.00001 0.00001"></a-light>
+
 
     <!--Roof-->
     <a-entity static-body="" geometry="depth: 21; height: 22; width: 0.5" position="-5.39692 7.69551 6.212"
@@ -2605,7 +2810,7 @@
     <a-entity gltf-model="#car2" position="10.5347 1.0595 6.86012" scale="0.5 0.5 0.55" rotation="0 180 0"></a-entity>
     <!--plane-->
     <a-entity geometry="primitive: plane; width: 200; height: 200" rotation="-90 0 0"
-      material="src: url(images/grass.jpg); repeat: 100 100" position="0 0.4 0"></a-entity>
+      material="src: images/grass.jpg; repeat: 100 100" position="0 0.4 -35.92425"></a-entity>
 
     <!--base-->
     <a-entity static-body="" geometry="depth: 20; height: 0.21; width: 25" position="-5.37462 0.47524 4.32962"
@@ -3289,8 +3494,9 @@
 
     <a-entity static-body="" geometry="depth: 3.3; height: 3.5; width: 0.15" position="-14.562 5.779 10.76118"
       material="src: images/stone-wall.jpg"></a-entity>
-    
-    <a-entity static-body="" geometry="depth: 1.25; height: 3.5; width: 0.15" position="-9.93923 5.779 8.8339" material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
+
+    <a-entity static-body="" geometry="depth: 1.25; height: 3.5; width: 0.15" position="-9.93923 5.779 8.8339"
+      material="src: images/stone-wall.jpg" scale="" rotation="0 90 0"></a-entity>
 
     <!--Arts-->
     <a-entity static-body="" geometry="height: 2.2; width: 0.02; depth: 0.9" position="-14.48167 6.24208 11.66997"
@@ -3336,7 +3542,7 @@
     <a-entity static-body="" geometry="depth: 0.6; height: 0.33; width: 0.02" position="-11.31014 4.32776 14.81062"
       material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
 
-      <a-entity static-body="" geometry="depth: 0.6; height: 0.33; width: 0.02" position="-11.31014 4.32776 14.81062"
+    <a-entity static-body="" geometry="depth: 0.6; height: 0.33; width: 0.02" position="-11.31014 4.32776 14.81062"
       material="src: images/dark-texture.jpg" rotation="0 90 0"></a-entity>
     <a-entity static-body="" geometry="depth: 0.03; height: 0.2; width: 0.02" position="-10.68011 5.08622 14.76944"
       material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2"></a-entity>
@@ -3351,7 +3557,7 @@
     <a-entity static-body="" geometry="depth: 0.03; height: 0.2; width: 0.02" position="-11.29677 4.40521 14.76944"
       material="src: images/metal-solid.jpg" rotation="90 90 0" scale="1 1 1.2"></a-entity>
     <!--window2-->
-    <a-entity static-body="" geometry="depth: 3.38; height: 0.2; width: 0.15" position="-14.562 7.16247 14.09732"
+    <a-entity static-body="" geometry="depth: 3.38; height: 0.24; width: 0.15" position="-14.562 7.22243 14.097"
       material="src: images/black.jpg" scale="" rotation=""></a-entity>
     <a-entity static-body="" geometry="depth: 3.38; height: 0.2; width: 0.15" position="-14.562 4.19039 14.09732"
       material="src: images/black.jpg" scale="" rotation=""></a-entity>
@@ -3903,7 +4109,20 @@
 
   </a-scene>
 </body>
-</a-scene>
-</body>
+<script>
+  const aframeScene = document.getElementById('aframeScene');
+  const loadingScreen = document.getElementById('loadingScreen');
+
+  aframeScene.addEventListener('progress', function (event) {
+    const progress = event.detail.loaded / event.detail.total;
+    loadingScreen.innerHTML = `Loading... ${(progress * 100).toFixed(2)}%`;
+  });
+  aframeScene.addEventListener('loaded', function () {
+    loadingScreen.style.display = 'none';
+    aframeScene.setAttribute('visible', 'true');
+  });
+</script>
+
+
 
 </html>
