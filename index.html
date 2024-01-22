@@ -9,113 +9,21 @@
   <script
     src="https://cdn.rawgit.com/IdeaSpaceVR/aframe-particle-system/v2.3.0/dist/aframe-particle-system.min.js"></script>
   <title>My WebVR House</title>
-</head>
+   <!--============================================================================JS=============================================================================-->
 
-<body>
- <!-- Loading screen -->
- <div id="loadingScreen">
-  <p>Loading...</p>
-</div>
-
-  <a-scene id="aframeScene" visible="false"
-    environment="preset: starry; ground: flat; groundColor: #656c65; groundTexture: none; horizonColor: #96a98a; skyColor: #b0d8ff; lightPosition: 1 50 -2; fog: 0.5w; fogColor: #b0d8ff; shadow: true; dressingColor: #004d00">
-    <!-- Your scene elements go here -->
-    <a-assets>
-      <!--======================================== Model Assets =========================================================-->
-      <a-asset-item id="slide-door" src="assets/16668_84x96_Slider_Door-Black_V1.obj"></a-asset-item>
-      <a-asset-item id="slide-door-material" src="assets/16668_84x96_Slider_Door-Black_V1.mtl"></a-asset-item>
-      <a-asset-item id="double-door" src="assets/modern_metal_windowed_door.glb"></a-asset-item>
-      <a-asset-item id="sofa" src="assets/sofa.obj"></a-asset-item>
-      <a-asset-item id="sofa-material" src="assets/sofa.mtl"></a-asset-item>
-      <a-asset-item id="lamp" src="assets/streetlamp.obj"></a-asset-item>
-      <a-asset-item id="lamp-material" src="assets/streetlamp.mtl"></a-asset-item>
-      <a-asset-item id="single-door" src="assets/door_glass_and_upper_glass_window.glb"></a-asset-item>
-      <a-asset-item id="car2" src="assets/classic_muscle_car.glb"></a-asset-item>
-      <a-asset-item id="plant2" src="assets/rhyzome_plant.glb"></a-asset-item>
-      <a-asset-item id="plant3" src="assets/potted_plant_mediterranean_med_leaf_low_poly.glb"></a-asset-item>
-      <a-asset-item id="sofa2" src="assets/grey_sofa.glb"></a-asset-item>
-      <a-asset-item id="ps5" src="assets/ps5.glb"></a-asset-item>
-      <a-asset-item id="controller" src="assets/ps5_low_poly_controller.glb"></a-asset-item>
-      <a-asset-item id="coffee" src="assets/coffee_cup.glb"></a-asset-item>
-      <a-asset-item id="sofa3" src="assets/old_sofa.glb"></a-asset-item>
-      <a-asset-item id="table" src="assets/round_table_from_the_matrix_construct.glb"></a-asset-item>
-      <a-asset-item id="sink" src="assets/kitchen_sink.glb"></a-asset-item>
-      <a-asset-item id="f-light" src="assets/fluorescent_light_ii.glb"></a-asset-item>
-      <a-asset-item id="stove" src="assets/stove_with_hood.glb"></a-asset-item>
-      <a-asset-item id="door" src="assets/door.glb"></a-asset-item>
-      <a-asset-item id="b-sink" src="assets/simple_sink.glb"></a-asset-item>
-      <a-asset-item id="toilet" src="assets/toilet_vaa-772662wh.glb"></a-asset-item>
-      <a-asset-item id="bed2" src="assets/bed.glb"></a-asset-item>
-      <a-asset-item id="bed" src="assets/bed_06.glb"></a-asset-item>
-      <a-asset-item id="table1" src="assets/table_office.glb"></a-asset-item>
-      <a-asset-item id="drawer" src="assets/ikea_alex_drawer_unit.glb"></a-asset-item>
-      <a-asset-item id="computer" src="assets/personal_computer.glb"></a-asset-item>
-      <a-asset-item id="chair2" src="assets/office_swivel_chair.glb"></a-asset-item>
-      <a-asset-item id="door2" src="assets/door2.glb"></a-asset-item>
-      <a-asset-item id="documents" src="assets/papers__envelopes.glb"></a-asset-item>
-      <a-asset-item id="plant4" src="assets/potted_plant_mediterranean_broad_leaf_low_poly.glb"></a-asset-item>
-      <a-asset-item id="folder" src="assets/folders.glb"></a-asset-item>
-      <a-asset-item id="shelf" src="assets/shelf.glb"></a-asset-item>
-      <a-asset-item id="coffeemaker" src="assets/coffee_maker.glb"></a-asset-item>
-
-      <a-asset-item id="ceillinglamp" src="assets/ceiling_lamp.glb"></a-asset-item>
-
-      <a-asset-item id="fence" src="assets/fence_vinyl_-_two_post_ends.glb"></a-asset-item>
-
-
-      <!--Images-->
-      <a-asset-item id="tv" src="images/tv.png"></a-asset-item>
-      <img id="fire" src="images/fire.png">
-      <img id="black" src="images/black.jpg">
-      <img id="steel" src="images/steel.jpg">
-      <img id="smoke" src="images/smoke.png">
-
-      <!--Audio-->
-      <audio id="openDoorAudio" src="assets/audio/opendoor.mp3" sound></audio>
-      <audio id="closeDoorAudio" src="assets/audio/closedoor.mp3" sound></audio>
-      <audio id="openFridge" src="assets/audio/fridgeopen.mp3" sound></audio>
-      <audio id="closeFridge" src="assets/audio/fridgeclose.mp3" sound></audio>
-      <audio id="Fridge" src="assets/audio/refrigerator.mp3" sound></audio>
-      <audio id="storageOpen" src="assets/audio/storageopen.mp3" sound></audio>
-      <audio id="storageClose" src="assets/audio/storageclose.mp3" sound></audio>
-      <audio id="drawerClose" src="assets/audio/drawerclose.mp3" sound></audio>
-      <audio id="drawerOpen" src="assets/audio/draweropen.mp3" sound></audio>
-
-      <audio id="toiletAudio" src="assets/audio/toiletFuck.mp3" sound></audio>
-      <audio id="sinkAudio" src="assets/audio/sink.mp3" sound></audio>
-      <audio id="showerAudio" src="assets/audio/shower.mp3" loop sound></audio>
-      <audio id="gasAudio" src="assets/audio/gas.mp3" sound></audio>
-      <audio id="teleport" src="assets/audio/teleport.mp3"></audio>
-      <audio id="light_switch" src="assets/audio/switch_click.mp3"></audio>
-
-
-      <!--Video-->
-      <video id="tv-video" src="videos/tv-video.mp4" loop></video>
-      <video id="ps5-video" src="videos/ps5.mp4" loop></video>
-      <video id="tv-video2" src="videos/tv-video2 .mp4" loop></video>
-      <video id="tv-video3" src="videos/tv-video3.mp4" loop></video>
-    </a-assets>
-
-    <a-entity rotation="0 180 0">
-      <a-entity id="cameraRig" position="5.256 2.2 11.301" camera wasd-controls="acceleration: 15"
-        look-controls="pointerLockEnabled: true; touchEnabled: false">
-        <!-- Enhanced Cursor -->
-        <a-entity id="cursor" cursor="fuse: false; rayOrigin: 0.1 0 0" raycaster="far: 1.5; objects: .intersectable" position="0 0 0">
-          <a-entity position="0 0 -0.5">
-            <a-plane width="0.05" height="0.005" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
-              geometry=""></a-plane>
-            <a-plane width="0.005" height="0.05" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
-              geometry=""></a-plane>
-          </a-entity>
-        </a-entity>
-      </a-entity>
-    </a-entity>
-    <!--=========================================================================================-->
-     <!--=====================================================================Interactable End=========================================================================================-->
-
-  <!--============================================================================JS=============================================================================-->
-
-  <script>
+   <style>
+    #loadingVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 9999;
+    }
+    
+   </style>
+   <script>
 
     //lights
     AFRAME.registerComponent('switch-light', {
@@ -173,10 +81,11 @@
           light.setAttribute('groundColor', '#222');
         }
       },
-
       playClickSound: function () {
-        var clickSound = document.querySelector('#light_switch');
-        clickSound.play();
+        var clickSound = document.getElementById('light_switch');
+        if (clickSound) {
+          clickSound.play();
+        }
       }
     });
 
@@ -2094,9 +2003,143 @@
 
   </script>
   <!---===========================================================================JS end=========================================================================-->
+</head>
+
+<body>
+
+  <a-scene 
+    environment="preset: starry; ground: flat; groundColor: #656c65; groundTexture: none; horizonColor: #96a98a; skyColor: #b0d8ff; lightPosition: 1 50 -2; fog: 0.5w; fogColor: #b0d8ff; shadow: true; dressingColor: #004d00">
+    <a-entity id="loadingScreen" visible="" position="-4.7 4.324 -8.350" rotation="0 180 0">
+      <a-video src="#loadingVideo" width="10" height="10" material="" geometry="width: 1; height: 0.5" position="0.57107 -2.13894 2.67786" visible=""></a-video>
+    </a-entity>
+    <!-- Your assets go here -->
+    <a-assets>
+      <!--======================================== Model Assets =========================================================-->
+      <video id="loadingVideo" crossorigin="anonymous" src="videos/s3.mp4"  playsinline autoplay preload="auto"></video>
+      <a-asset-item id="slide-door" src="assets/16668_84x96_Slider_Door-Black_V1.obj"></a-asset-item>
+      <a-asset-item id="slide-door-material" src="assets/16668_84x96_Slider_Door-Black_V1.mtl"></a-asset-item>
+      <a-asset-item id="double-door" src="assets/modern_metal_windowed_door.glb"></a-asset-item>
+      <a-asset-item id="sofa" src="assets/sofa.obj"></a-asset-item>
+      <a-asset-item id="sofa-material" src="assets/sofa.mtl"></a-asset-item>
+      <a-asset-item id="lamp" src="assets/streetlamp.obj"></a-asset-item>
+      <a-asset-item id="lamp-material" src="assets/streetlamp.mtl"></a-asset-item>
+      <a-asset-item id="single-door" src="assets/door_glass_and_upper_glass_window.glb"></a-asset-item>
+      <a-asset-item id="car2" src="assets/classic_muscle_car.glb"></a-asset-item>
+      <a-asset-item id="plant2" src="assets/rhyzome_plant.glb"></a-asset-item>
+      <a-asset-item id="plant3" src="assets/potted_plant_mediterranean_med_leaf_low_poly.glb"></a-asset-item>
+      <a-asset-item id="sofa2" src="assets/grey_sofa.glb"></a-asset-item>
+      <a-asset-item id="ps5" src="assets/ps5.glb"></a-asset-item>
+      <a-asset-item id="controller" src="assets/ps5_low_poly_controller.glb"></a-asset-item>
+      <a-asset-item id="coffee" src="assets/coffee_cup.glb"></a-asset-item>
+      <a-asset-item id="sofa3" src="assets/old_sofa.glb"></a-asset-item>
+      <a-asset-item id="table" src="assets/round_table_from_the_matrix_construct.glb"></a-asset-item>
+      <a-asset-item id="sink" src="assets/kitchen_sink.glb"></a-asset-item>
+      <a-asset-item id="f-light" src="assets/fluorescent_light_ii.glb"></a-asset-item>
+      <a-asset-item id="stove" src="assets/stove_with_hood.glb"></a-asset-item>
+      <a-asset-item id="door" src="assets/door.glb"></a-asset-item>
+      <a-asset-item id="b-sink" src="assets/simple_sink.glb"></a-asset-item>
+      <a-asset-item id="toilet" src="assets/toilet_vaa-772662wh.glb"></a-asset-item>
+      <a-asset-item id="bed2" src="assets/bed.glb"></a-asset-item>
+      <a-asset-item id="bed" src="assets/bed_06.glb"></a-asset-item>
+      <a-asset-item id="table1" src="assets/table_office.glb"></a-asset-item>
+      <a-asset-item id="drawer" src="assets/ikea_alex_drawer_unit.glb"></a-asset-item>
+      <a-asset-item id="computer" src="assets/personal_computer.glb"></a-asset-item>
+      <a-asset-item id="chair2" src="assets/office_swivel_chair.glb"></a-asset-item>
+      <a-asset-item id="door2" src="assets/door2.glb"></a-asset-item>
+      <a-asset-item id="documents" src="assets/papers__envelopes.glb"></a-asset-item>
+      <a-asset-item id="plant4" src="assets/potted_plant_mediterranean_broad_leaf_low_poly.glb"></a-asset-item>
+      <a-asset-item id="folder" src="assets/folders.glb"></a-asset-item>
+      <a-asset-item id="shelf" src="assets/shelf.glb"></a-asset-item>
+      <a-asset-item id="coffeemaker" src="assets/coffee_maker.glb"></a-asset-item>
+
+      <a-asset-item id="ceillinglamp" src="assets/ceiling_lamp.glb"></a-asset-item>
+
+      <a-asset-item id="fence" src="assets/fence_vinyl_-_two_post_ends.glb"></a-asset-item>
+      <a-asset-item id="pond" src="assets/pond.glb"></a-asset-item>
+      <a-asset-item id="outsidelamp" src="assets/stonelamp.glb"></a-asset-item>
+      <a-asset-item id="pine" src="assets/pine_tree_low_poly.glb"></a-asset-item>
+      <a-asset-item id="capy" src="assets/capybara_ps1_style.glb"></a-asset-item>
+      <a-asset-item id="lilyflower" src="assets/origami_-_water_lilies.glb"></a-asset-item>
+
+      <!--Images-->
+      <a-asset-item id="tv" src="images/tv.png"></a-asset-item>
+      <img id="fire" src="images/fire.png">
+      <img id="black" src="images/black.jpg">
+      <img id="steel" src="images/steel.jpg">
+      <img id="smoke" src="images/smoke.png">
+
+      <!--Audio-->
+      <audio id="openDoorAudio" src="assets/audio/opendoor.mp3" sound></audio>
+      <audio id="closeDoorAudio" src="assets/audio/closedoor.mp3" sound></audio>
+      <audio id="openFridge" src="assets/audio/fridgeopen.mp3" sound></audio>
+      <audio id="closeFridge" src="assets/audio/fridgeclose.mp3" sound></audio>
+      <audio id="Fridge" src="assets/audio/refrigerator.mp3" sound></audio>
+      <audio id="storageOpen" src="assets/audio/storageopen.mp3" sound></audio>
+      <audio id="storageClose" src="assets/audio/storageclose.mp3" sound></audio>
+      <audio id="drawerClose" src="assets/audio/drawerclose.mp3" sound></audio>
+      <audio id="drawerOpen" src="assets/audio/draweropen.mp3" sound></audio>
+
+      <audio id="toiletAudio" src="assets/audio/toiletFuck.mp3" sound></audio>
+      <audio id="sinkAudio" src="assets/audio/sink.mp3" sound></audio>
+      <audio id="showerAudio" src="assets/audio/shower.mp3" loop sound></audio>
+      <audio id="gasAudio" src="assets/audio/gas.mp3" sound></audio>
+      <audio id="teleport" src="assets/audio/teleport.mp3"></audio>
+      <audio id="light_switch" src="assets/audio/switch_click.mp3" sound></audio>
+
+
+      <!--Video-->
+      <video id="tv-video" src="videos/tv-video.mp4" loop></video>
+      <video id="ps5-video" src="videos/ps5.mp4" loop></video>
+      <video id="tv-video2" src="videos/tv-video2 .mp4" loop></video>
+      <video id="tv-video3" src="videos/tv-video3.mp4" loop></video>
+    </a-assets>
+
+    <a-entity rotation="0 180 0">
+      <a-entity id="cameraRig" position="5.256 2.2 11.301" camera wasd-controls="acceleration: 20"
+        look-controls="pointerLockEnabled: true; touchEnabled: false">
+        <!-- Enhanced Cursor -->
+        <a-entity id="cursor" cursor="fuse: false; rayOrigin: 0.05 0 0" raycaster="far: 1.5; objects: .intersectable" position="0 0 0">
+          <a-entity position="0 0 -0.5">
+            <a-plane width="0.05" height="0.005" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
+              geometry=""></a-plane>
+            <a-plane width="0.005" height="0.05" material="color: #fff; shader: flat; transparent: true; opacity: 0.7"
+              geometry=""></a-plane>
+          </a-entity>
+        </a-entity>
+      </a-entity>
+    </a-entity>
+    <!--=========================================================================================-->
+     <!--=====================================================================Interactable End=========================================================================================-->
 
     <!--=====================================================================Interactable=========================================================================================-->
-  
+   
+    <!--pond-->
+    <a-entity static-body="" position="-6.51485 0.18645 27.26317" gltf-model="#pond" scale="0.015 0.015 0.015" rotation=""></a-entity>
+    
+    <!--Caby-->
+    <a-entity static-body="" position="-6.92765 -1.22852 25.80033" gltf-model="#capy" scale="2 2 2" rotation=""></a-entity>
+
+    <a-entity static-body="" position="-4.1953 0.55338 26.33105" gltf-model="#lilyflower" scale="0.4 0.4 0.4" rotation=""></a-entity>
+
+    <!--lilypad-->
+    <a-entity static-body="" position="-11.66129 0.50959 25.91303" gltf-model="#lilyflower" scale="0.4 0.4 0.4" rotation=""></a-entity>
+    <a-entity static-body="" position="-7.41527 0.53014 23.58144" gltf-model="#lilyflower" scale="0.3 0.3 0.3" rotation="0 90 0"></a-entity>
+    <a-entity static-body="" position="-8.05568 0.56129 28.3568" gltf-model="#lilyflower" scale="0.2 0.2 0.2" rotation="0 90 0"></a-entity>
+    
+    <!--lamp-->
+    <a-entity static-body="" position="-0.25732 0.305 30.01628" gltf-model="#outsidelamp" scale="0.7 0.7 0.7" rotation=""></a-entity>
+    <a-entity geometry="primitive: sphere; radius: 0.23" material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2" position="-13.48385 2.447 30.02632" rotation="0 90 0"></a-entity>
+    <a-light type="directional" position="-0.06209 2.18199 29.95558" target="#ground" castshadow="true" light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 10; intensity: 4" scale="0.00001 0.00001 0.00001"></a-light>
+    <a-entity static-body="" position="-13.483 0.30454 30.016" gltf-model="#outsidelamp" scale="0.7 0.7 0.7" rotation=""></a-entity>
+    <a-light type="directional" position="-13.47786 2.18199 30.04208" target="#ground" castshadow="true" light="type: point; target: #lamp; color: #FFD700; groundColor: #f5e78e; distance: 10; intensity: 4" scale="0.00001 0.00001 0.00001"></a-light>
+    <a-entity geometry="primitive: sphere; radius: 0.23" material="color: #fff2a8; transparent: true; opacity: 0.8; roughness: 0.05; metalness: 0.9; blending: additive; emissive: #ffffcc; emissiveIntensity: 2" position="-0.26943 2.447 30.02632" rotation="0 90 0"></a-entity>
+    <!--pine tree-->
+    <a-entity static-body="" position="3.57785 -1.38614 1.20591" gltf-model="#pine" scale="5 5 5" rotation="0 48.04594886849032 0"></a-entity>
+    <a-entity static-body="" position="1.01231 -1.84914 6.45111" gltf-model="#pine" scale="4 6 6" rotation="0 48.04594886849032 0"></a-entity>
+    <a-entity static-body="" position="35.86329 -1.0751 27.71192" gltf-model="#pine" scale="8 7 7" rotation="0 -36.54897775139521 0"></a-entity>
+    <a-entity static-body="" position="-37.28883 0.38609 28.53036" gltf-model="#pine" scale="5 5 5" rotation="0 124.749 0"></a-entity>
+    <a-entity static-body="" position="-2.2254 -0.56293 18.98265" gltf-model="#pine" scale="5 8 6" rotation="0 -16.82375973842636 0"></a-entity>
+    <a-entity static-body="" position="-4.73576 -0.75652 11.63244" gltf-model="#pine" scale="5 5 5" rotation=""></a-entity>
 
     <!--Entrance doors-->
     <!-- Door left -->
@@ -4110,18 +4153,18 @@
   </a-scene>
 </body>
 <script>
-  const aframeScene = document.getElementById('aframeScene');
-  const loadingScreen = document.getElementById('loadingScreen');
+   // Play the loading video
+   var loadingVideo = document.getElementById('loadingVideo');
+   loadingVideo.play();
 
-  aframeScene.addEventListener('progress', function (event) {
-    const progress = event.detail.loaded / event.detail.total;
-    loadingScreen.innerHTML = `Loading... ${(progress * 100).toFixed(2)}%`;
-  });
-  aframeScene.addEventListener('loaded', function () {
-    loadingScreen.style.display = 'none';
-    aframeScene.setAttribute('visible', 'true');
-  });
+   // Wait for the video to load
+   loadingVideo.addEventListener('loadeddata', function() {
+     setTimeout(function() {
+       document.getElementById('loadingScreen').setAttribute('visible', 'false');
+     }, 30000); // 40 seconds
+   });
 </script>
+
 
 
 
