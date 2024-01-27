@@ -2009,6 +2009,7 @@
 
   <a-scene 
     environment="preset: starry; ground: flat; groundColor: #656c65; groundTexture: none; horizonColor: #96a98a; skyColor: #b0d8ff; lightPosition: 1 50 -2; fog: 0.5w; fogColor: #b0d8ff; shadow: true; dressingColor: #004d00">
+
     <!-- Your assets go here -->
     <a-assets>
       <!--======================================== Model Assets =========================================================-->
@@ -2105,6 +2106,9 @@
           </a-entity>
         </a-entity>
       </a-entity>
+    </a-entity>
+    <a-entity id="loadingScreen" visible="" position="-4.7 4.324 -8.350" rotation="0 180 0">
+      <a-video src="#loadingVideo" width="10" height="10" material="" geometry="width: 1; height: 0.5" position="0.57107 -2.13894 2.67786" visible=""></a-video>
     </a-entity>
     <!--=========================================================================================-->
      <!--=====================================================================Interactable End=========================================================================================-->
