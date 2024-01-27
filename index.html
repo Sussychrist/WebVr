@@ -2078,6 +2078,7 @@
       <audio id="storageClose" src="assets/audio/storageclose.mp3" sound></audio>
       <audio id="drawerClose" src="assets/audio/drawerclose.mp3" sound></audio>
       <audio id="drawerOpen" src="assets/audio/draweropen.mp3" sound></audio>
+      <audio id="pullup" src="assets/audio/pullup.mp3" sound></audio>
 
       <audio id="toiletAudio" src="assets/audio/toiletFuck.mp3" sound></audio>
       <audio id="sinkAudio" src="assets/audio/sink.mp3" sound></audio>
@@ -2095,7 +2096,7 @@
     </a-assets>
 
     <a-entity rotation="0 180 0">
-      <a-entity id="cameraRig" position="5.256 2.2 11.301" camera wasd-controls="acceleration: 20"
+      <a-entity id="cameraRig" position="5.256 2.2 11.301" camera wasd-controls="acceleration: 15"
         look-controls="pointerLockEnabled: true; touchEnabled: false">
         <!-- Enhanced Cursor -->
         <a-entity id="cursor" cursor="fuse: false; rayOrigin: 0.05 0 0" raycaster="far: 1.5; objects: .intersectable" position="0 0 0">
@@ -2151,7 +2152,7 @@
    <a-text id="SwitchText-37" align="center" color="#FFF" position="-10.17251 5.65416 9.81262" rotation="0 90 0" text="width: 3; value: Toilet"></a-text>
 
     <!--pond-->
-    <a-entity static-body="" position="-6.51485 0.18645 27.26317" gltf-model="#pond" scale="0.015 0.015 0.015" rotation=""></a-entity>
+    <a-entity static-body="" position="-6.51485 0.18645 27.26317" gltf-model="#pond" scale="0.015 0.015 0.015" rotation="" sound="on: click; src: #pullup"></a-entity>
     
     <!--Caby-->
     <a-entity static-body="" position="-6.92765 -1.22852 25.80033" gltf-model="#capy" scale="2 2 2" rotation=""></a-entity>
